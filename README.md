@@ -3,7 +3,7 @@
 Internet of Things -like web-application for monitoring construction site air quality. Server hosting by DigitalOcean.
 
 ## Techniques used:
-Arduino Web Client: Send data to server.
+Arduino WifiClient: Send data to server.
 
 Apache: Run server.
 

@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'devicedata.apps.DevicedataConfig',
+    #'devicedata.apps.DevicedataConfig',
+    'devicedata',
     'channels',
 ]
 
