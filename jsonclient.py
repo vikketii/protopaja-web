@@ -6,12 +6,13 @@ import datetime
 import requests
 import sys
 
-myurl = "http://127.0.0.1:8000/devicedata/send-json/"
+myurl_admin = "http://127.0.0.1:8000/admin/"
+myurl = "http://127.0.0.1:8000/send-json/"
 client = requests.session()
 n = 1
 
 # Retrieve CSRF token
-client.get(myurl) # sets cookie
+client.get(myurl_admin) # sets cookie
 csrftoken = client.cookies['csrftoken']
 
 login_data = dict(username='', password='', csrfmiddlewaretoken=csrftoken, next='/')
@@ -37,9 +38,9 @@ while True:
 
     response = client.post(myurl, data=login_data)
 
-    print("{0} packet send. Response: {1}" .format(n, response))
+    print("{0} packet send. Response: {1}" .format(n, response.text))
 
-    print("1 packet send." if n == 1 else "{0} packets send." .format(n))
+    #print("1 packet send." if n == 1 else "{0} packets send." .format(n))
     n += 1
     time.sleep(2)
 
