@@ -1,0 +1,42 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Charts</h1>
+<canvas id="pollution_chart" width="400" height="400"></canvas>
+
+{% endblock content %}
+
+{% block script %}
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script>
+var ctx = document.getElementById("pollution_chart");
+var data = [200, 220, 194, NaN, 170, 192, 212];
+var colours = data.map((value) => value < 200 ? 'green' : 'red');
+
+var pollution_chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+            label: 'Pollution',
+            data: data,
+            pointBorderColor: colours,
+            pointBackgroundColor: colours,
+            fill: false,
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
+
+{% endblock script %}

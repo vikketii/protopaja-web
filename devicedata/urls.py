@@ -1,9 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
+    path('', views.index, name='index'),
+    path('send-json/', views.send_json, name='send-json'),
+    path('charts/', views.charts, name='charts')
 ]
 
 

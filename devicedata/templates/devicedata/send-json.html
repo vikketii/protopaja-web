@@ -1,0 +1,8 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+	<form method="post">
+		{% csrf_token %}
+		<input type="hidden" name="received-data">
+	</form>
+{% endblock content %}
