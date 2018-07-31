@@ -21,14 +21,20 @@ class Data(models.Model):
         collection_date: datetime value
         temperature: 0 - 99
         humidity: 0 - 99
-        light: 0 - 9 (not implemented)
         dust: 0 - 99 (not implemented)
+        light: 0 - 9 (not implemented)
         voltage: 0 - 99 (not imlemented)
     """
     device = models.ForeignKey(Device, on_delete=models.CASCADE) # Link data to device
     collection_date = models.DateTimeField() # Date and time of data collected
-    temperature = models.FloatField()
+    temperature = models.IntegerField()
     humidity = models.IntegerField()
+
+    # TODO
+    dust = models.IntegerField(null=True, blank=True)
+    light = models.IntegerField(null=True, blank=True)
+    voltage = models.IntegerField(null=True, blank=True)
+
 
     def __str__(self):
         return 'Date: {0}, Temp: {1}, Device ID: ({2})' \

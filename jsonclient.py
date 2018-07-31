@@ -46,8 +46,8 @@ while True:
     response = client.post(myurl, data=data)
 
     # response content is human readable whereas response itself is messy
-    print("{0} packet send. Response (first 40 char): {1}" .format(n, response.content[:40]))
+    print("{0}. packet send. Response (first 40 char): {1}" .format(n, response.content[:40]))
 
     #print("1 packet send." if n == 1 else "{0} packets send." .format(n))
     n += 1
-    time.sleep(2)
+    time.sleep(1)

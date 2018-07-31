@@ -3,7 +3,8 @@
 {% block content %}
 
 <h1>Charts</h1>
-<canvas id="temperature_chart" width="40" height="16"></canvas>
+<canvas id="temperature_chart" width="40" height="18"></canvas>
+<canvas id="humidity_chart" width="40" height="18"></canvas>
 
 {% endblock content %}
 
@@ -15,8 +16,8 @@ var endpoint = '/api/data/'
 
 var time_data = []
 var temperature_data = []
-var pollution_data = []
 var humidity_data = []
+var pollution_data = []
 
 
 $.ajax({
@@ -45,32 +46,91 @@ function getChartDatas(data){
     for (i = 0; i < n; i++) {
         time_data.push(data.data[i].date)
         temperature_data.push(data.data[i].temperature)
+        humidity_data.push(data.data[i].humidity)
     }
 }
 
 function setCharts(data){
     setTempChart(data)
+    setHumidityChart(data)
+}
+
+function setHumidityChart(){
+    var ctx = document.getElementById("humidity_chart");
+
+    var humidity_chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: time_data,
+            datasets: [{
+                data: humidity_data,
+                pointBorderColor: 'rgb(75, 192, 192)',
+                pointBackgroundColor: 'rgb(75, 192, 192)',
+                fill: false,
+                lineTension: 0.1,
+            }]
+        },
+        options: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: 'Humidity',
+                fontSize: 16,
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        suggestedMin: 1940,
+                        suggestedMax: 2160,
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        source: 'data',
+                    },
+                    type: 'time',
+                    bounds: 'ticks',
+                    // data is spread at the same distance from each other, not according to time
+                    distribution: 'series',
+                    time: {
+                        unit: 'second',
+                        displayFormats: {
+                            'second': 'DD/MM/YY - HH:mm:ss',
+                        }
+                    }
+                }]
+            }
+        }
+    });
 }
 
 function setTempChart(){
     var ctx = document.getElementById("temperature_chart");
-    var colours = temperature_data.map((value) => value < 25 ? 'green' : 'red');
+    var colours = temperature_data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red');
 
     var temperature_chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: time_data,
             datasets: [{
-                label: 'Temperature (Warning at 25 Celsius)',
                 data: temperature_data,
                 pointBorderColor: colours,
                 pointBackgroundColor: colours,
-                borderColor: 'rgb(75, 192, 192)',
                 fill: false,
                 lineTension: 0.1,
             }]
         },
         options: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: true,
+                text: 'Temperature (Warning at 25 Celsius)',
+                fontSize: 16,
+            },
             scales: {
                 yAxes: [{
                     ticks: {
@@ -90,9 +150,6 @@ function setTempChart(){
                         unit: 'second',
                         displayFormats: {
                             'second': 'DD/MM/YY - HH:mm:ss',
-                            'minute': 'hh:mm',
-                            'hour': 'DD - hh:mm',
-                            'day': 'DD.MM - hh',
                         }
                     }
                 }]

@@ -19,7 +19,6 @@ class IndexView(generic.ListView):
         return Data.objects.order_by('-collection_date')[:3]
 """
 
-
 def index(request):
     latest_data_list = Data.objects.order_by('-collection_date')[:3]
     context = {
@@ -76,8 +75,8 @@ def send_json(request):
 
 # API data, in product should require authentication made with Django REST or something similar
 def get_data(request):
-    # Get data as dictionary, newest first
-    data_list = [ Data.as_dict() for Data in Data.objects.order_by('-collection_date')]
+    # Get data as dictionary, newest first and limit is 100
+    data_list = [ Data.as_dict() for Data in Data.objects.order_by('-collection_date')[:100]]
 
     # To get safe=True, we would have to write our own serializer
     return JsonResponse(({'data': data_list}), safe=False)
