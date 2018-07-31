@@ -1,15 +1,10 @@
 from django.urls import path
 
-from . import views
+from .views import index, charts, send_json, get_data
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('send-json/', views.send_json, name='send-json'),
-    path('charts/', views.charts, name='charts')
+    path('', index, name='index'),
+    path('charts/', charts, name='charts'),
+    path('send-json/', send_json, name='send-json'),
+    path('api/data/', get_data, name='api-data'),
 ]
-
-
-
-#urlpatterns = [
-#    path('', views.IndexView.as_view(), name='index'),
-#]

@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import generic
 
@@ -9,7 +9,13 @@ from .models import Data
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 
-# Create your views here.
+# Testing json serialization
+from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+
+
 
 """
 class IndexView(generic.ListView):
@@ -49,9 +55,21 @@ def send_json(request):
 
     return HttpResponse('Page was found')
 
-
-
-
 def charts(request):
     context = {}
     return render(request, 'devicedata/charts.html', context)
+
+
+
+# API data, in product should require authentication, for example Django REST
+def get_data(request):
+    # data_list = Data.objects.order_by('-collection_date')
+    # Serialize data for JsonResponse
+    # output = serializers.serialize('json', data_list)
+
+    # Get data as dictionary, newest first
+    data_list = [ Data.as_dict() for Data in Data.objects.order_by('-collection_date')]
+
+
+    # To get safe=True, we would have to write our own serializer
+    return JsonResponse(({'data': data_list}), safe=False)

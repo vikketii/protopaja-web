@@ -23,8 +23,9 @@
 
 {% endblock content %}
 
-{% block script %}
+
 <script>
+{% block script %}
 
     var chatSocket = new WebSocket(
         'ws://' + window.location.host +
@@ -56,5 +57,5 @@
 
         messageInputDom.value = '';
     };
-</script>
 {% endblock script %}
+</script>

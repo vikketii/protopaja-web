@@ -27,3 +27,14 @@ class Data(models.Model):
         return 'Date: {0}, Temp: {1}, Device ID: ({2})' \
         .format(self.collection_date, self.temperature, self.device.info)
 
+    # Converting model in to dict for API
+    def as_dict(self):
+        # Charts don't use default datetime format, so we need to change it
+        date = self.collection_date.strftime("%Y-%m-%dT%H:%M:%S")
+        return {
+            'device': self.device.id,
+            'date': date,
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+        }
+
