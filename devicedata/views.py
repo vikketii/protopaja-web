@@ -4,18 +4,10 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import generic
 
-from .models import Data
+from .models import Data, Device
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
-
-# Testing json serialization
-from django.core import serializers
-from django.core.serializers.json import DjangoJSONEncoder
-import json
-
-
-
 
 """
 class IndexView(generic.ListView):
@@ -35,10 +27,13 @@ def index(request):
     }
     return render(request, 'devicedata/index.html', context)
 
+def charts(request):
+    context = {}
+    return render(request, 'devicedata/charts.html', context)
 
 
 # not requiring csrf
-#@csrf_exempt
+@csrf_exempt
 
 # requires login and redirects to /accounts/login/ if not logged in
 #@login_required
@@ -49,27 +44,40 @@ def send_json(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            #authentication succesfull
             login(request, user)
-            response = 'POST request has arrived. Here is the data: {0}' .format(request.body)
-            return HttpResponse(response)
+            #response = 'POST request has arrived. Here is the data: {0}' .format(request.body)
+            
+            # These need to be integers as their matching fields
+            # are defined as IntegerFields in models.py
+            device_id = request.POST['device']
+            temp = int(request.POST['temperature'])
+            humd = int(request.POST['humidity'])
+            time = request.POST['collection_date']
 
-    return HttpResponse('Page was found')
+            try:
+                # try to find the correct object
+                device = Device.objects.get(id = device_id)
 
-def charts(request):
-    context = {}
-    return render(request, 'devicedata/charts.html', context)
+            except Device.DoesNotExist:
+                # a new slave module, create a new device object
+                device = Device.objects.create(info=('Sensor station '+str(device_id)), id = device_id)
+                return HttpResponse(device)
+            
+            finally:
+                #device = Device.objects.get(id = device_id)
+                # create a new data object for the correct device
+                data_object = Data.objects.create(device = device, collection_date = time, temperature = temp, humidity = humd)
+                return HttpResponse(data_object)
+
+    # incorrect username/password
+    return HttpResponse('Unauthorized request')
 
 
-
-# API data, in product should require authentication, for example Django REST
+# API data, in product should require authentication made with Django REST or something similar
 def get_data(request):
-    # data_list = Data.objects.order_by('-collection_date')
-    # Serialize data for JsonResponse
-    # output = serializers.serialize('json', data_list)
-
     # Get data as dictionary, newest first
     data_list = [ Data.as_dict() for Data in Data.objects.order_by('-collection_date')]
-
 
     # To get safe=True, we would have to write our own serializer
     return JsonResponse(({'data': data_list}), safe=False)

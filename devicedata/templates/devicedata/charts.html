@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Charts</h1>
-<canvas id="temperature_chart" width="400" height="400"></canvas>
+<canvas id="temperature_chart" width="40" height="16"></canvas>
 
 {% endblock content %}
 
@@ -12,10 +12,15 @@
 {% block script %}
 
 var endpoint = '/api/data/'
+
 var time_data = []
 var temperature_data = []
+var pollution_data = []
+var humidity_data = []
+
 
 $.ajax({
+    // Get measurements from API
     method: "GET", 
     url: endpoint,
     success: function(data){
@@ -31,21 +36,16 @@ $.ajax({
 })
 
 function getChartDatas(data){
-    getTempChartData(data)
-    getTimeData(data)
-}
-
-function getTimeData(data){
-    for (i = 0; i < data.data.length; i++) {
-        time_data.push(data.data[i].date)
+    // Limits datapoints to n
+    var n = 30
+    if (data.data.length < n){
+        n = data.data.length
     }
-}
 
-function getTempChartData(data){
-    for (i = 0; i < data.data.length; i++) {
+    for (i = 0; i < n; i++) {
+        time_data.push(data.data[i].date)
         temperature_data.push(data.data[i].temperature)
     }
-    console.log(temperature_data)
 }
 
 function setCharts(data){
@@ -54,34 +54,45 @@ function setCharts(data){
 
 function setTempChart(){
     var ctx = document.getElementById("temperature_chart");
-    var colours = temperature_data.map((value) => value < 28 ? 'green' : 'red');
+    var colours = temperature_data.map((value) => value < 25 ? 'green' : 'red');
 
     var temperature_chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: time_data.slice(0,3),
+            labels: time_data,
             datasets: [{
-                label: 'Temperature',
-                data: temperature_data.slice(0,3),
+                label: 'Temperature (Warning at 25 Celsius)',
+                data: temperature_data,
                 pointBorderColor: colours,
                 pointBackgroundColor: colours,
+                borderColor: 'rgb(75, 192, 192)',
                 fill: false,
-                lineTension: 0,
+                lineTension: 0.1,
             }]
         },
         options: {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero:true
+                        suggestedMin: 10,
+                        suggestedMax: 36,
                     }
                 }],
                 xAxes: [{
+                    ticks: {
+                        source: 'data',
+                    },
                     type: 'time',
+                    bounds: 'ticks',
+                    // data is spread at the same distance from each other, not according to time
+                    distribution: 'series',
                     time: {
-                        unit: 'hour',
+                        unit: 'second',
                         displayFormats: {
-                            'hour': 'HH:mm',
+                            'second': 'DD/MM/YY - HH:mm:ss',
+                            'minute': 'hh:mm',
+                            'hour': 'DD - hh:mm',
+                            'day': 'DD.MM - hh',
                         }
                     }
                 }]

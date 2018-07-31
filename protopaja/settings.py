@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Europe/Helsinki'
+TIME_ZONE = 'UTC' # 'Europe/Helsinki' Messes with models DateTimeField()
 
 USE_I18N = True
 

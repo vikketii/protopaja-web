@@ -17,6 +17,13 @@ class Device(models.Model):
 class Data(models.Model):
     """
     Model representing one received measurement data.
+    Values integers:
+        collection_date: datetime value
+        temperature: 0 - 99
+        humidity: 0 - 99
+        light: 0 - 9 (not implemented)
+        dust: 0 - 99 (not implemented)
+        voltage: 0 - 99 (not imlemented)
     """
     device = models.ForeignKey(Device, on_delete=models.CASCADE) # Link data to device
     collection_date = models.DateTimeField() # Date and time of data collected
