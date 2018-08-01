@@ -23,8 +23,7 @@ while True:
     temperature = random.randint(20, 28)
     humidity = random.randint(2000, 2100)
     collection_date = datetime.datetime.now()
-    # using device.id with uuid
-    device = 'd0bfb26d-d218-41f4-9ec2-fec4a05a3120'
+    device_id = '1'
 
     
     #json object, didn't get inner json working -> only 1 json
@@ -32,7 +31,7 @@ while True:
         "username": 'testi',
         "password" : 'prototesti',
         "csrfmiddlewaretoken" : csrftoken,
-        "device" : device,
+        "device_id" : device_id,
         "collection_date" : collection_date,
         "pollution" : pollution,
         "temperature" : temperature,
@@ -50,4 +49,4 @@ while True:
 
     #print("1 packet send." if n == 1 else "{0} packets send." .format(n))
     n += 1
-    time.sleep(1)
+    time.sleep(2)

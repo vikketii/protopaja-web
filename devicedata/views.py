@@ -49,7 +49,7 @@ def send_json(request):
             
             # These need to be integers as their matching fields
             # are defined as IntegerFields in models.py
-            device_id = request.POST['device']
+            device_id = request.POST['device_id']
             temp = int(request.POST['temperature'])
             humd = int(request.POST['humidity'])
             time = request.POST['collection_date']

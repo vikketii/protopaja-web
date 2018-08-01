@@ -1,14 +1,11 @@
 from django.db import models
 
-# for unique device id's
-import uuid
-
 
 class Device(models.Model):
     """
     Model representing slave device.
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for this device")
+    id = models.IntegerField(primary_key=True)
     info = models.CharField(max_length=200)
 
     def __str__(self):
