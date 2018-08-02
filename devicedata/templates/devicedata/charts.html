@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 
+
 {% block content %}
 
 <h1>Charts</h1>
@@ -15,26 +16,53 @@
 var endpoint = '/api/data/'
 
 var time_data = []
+
 var temperature_data = []
 var humidity_data = []
 var pollution_data = []
 
+var charts = []
 
-$.ajax({
-    // Get measurements from API
-    method: "GET", 
-    url: endpoint,
-    success: function(data){
-        console.log(data);
-        
-        getChartDatas(data)
-        setCharts(data)
-    },
-    error: function(error_data){
-        console.log("error")
-        console.log(error_data)
-    }
+$.when(
+    $.ajax({
+        // Get measurement data from API
+        method: "GET", 
+        url: endpoint,
+        success: function(data){
+            getChartDatas(data)
+            setCharts(data)
+        },
+        error: function(error_data){
+            console.log("error")
+            console.log(error_data)
+        }
+    })
+// When the first setup is done, keep updating with setInterval
+).then(function() {
+    setInterval(function() {
+        $.ajax({
+            method: "GET", 
+            url: endpoint,
+            success: function(data) {
+                // start updating if newest time is not the same we already have
+                if (charts[0].data.labels[0] != data.data[0].date) {
+                    // update time
+                    time_data.unshift(data.data[0].date)
+                    time_data.pop()
+                    // update charts
+                    for (var i in charts) {
+                        updateChart(charts[i], data)
+                    }
+                }
+            },
+            error: function(error_data){
+                console.log("error")
+                console.log(error_data)
+            }
+        })
+    }, 2000) // update interval in milliseconds
 })
+
 
 function getChartDatas(data){
     // Limits datapoints to n
@@ -50,12 +78,15 @@ function getChartDatas(data){
     }
 }
 
+
 function setCharts(data){
-    setTempChart(data)
-    setHumidityChart(data)
+    temperature_chart = setTempChart(data)
+    humidity_chart = setHumidityChart(data)
+
+    charts.push(humidity_chart, temperature_chart)
 }
 
-function setHumidityChart(){
+function setHumidityChart(data){
     var ctx = document.getElementById("humidity_chart");
 
     var humidity_chart = new Chart(ctx, {
@@ -63,6 +94,7 @@ function setHumidityChart(){
         data: {
             labels: time_data,
             datasets: [{
+                name: 'humidity',
                 data: humidity_data,
                 pointBorderColor: 'rgb(75, 192, 192)',
                 pointBackgroundColor: 'rgb(75, 192, 192)',
@@ -104,17 +136,19 @@ function setHumidityChart(){
             }
         }
     });
+
+    return humidity_chart
 }
 
-function setTempChart(){
+function setTempChart(data){
     var ctx = document.getElementById("temperature_chart");
     var colours = temperature_data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red');
-
     var temperature_chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: time_data,
             datasets: [{
+                name: 'temperature',
                 data: temperature_data,
                 pointBorderColor: colours,
                 pointBackgroundColor: colours,
@@ -156,6 +190,32 @@ function setTempChart(){
             }
         }
     });
+
+    return temperature_chart
+}
+
+
+function updateChart(chart, data) {
+        // forEach is for multiple graphs in same chart
+        chart.data.datasets.forEach((dataset) => {
+            if (dataset.name == 'temperature') {
+                // update measurements
+                dataset.data.unshift(data.data[0].temperature)
+                dataset.data.pop()
+
+                // update limit colors
+                var colours = dataset.data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red')
+                dataset.pointBorderColor = colours
+                dataset.pointBackgroundColor = colours
+            }
+            else if (dataset.name == 'humidity') {
+                // update measurements
+                dataset.data.unshift(data.data[0].humidity)
+                dataset.data.pop()
+            }
+        })
+        // 0 disables animation
+        chart.update(0)
 }
 
 
