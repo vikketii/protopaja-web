@@ -1,0 +1,62 @@
+{% extends "base_generic_older.html" %}
+
+    {% block content %}
+    <table id="data_table1" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Device</th>
+                <th>Device info</th>
+                <th>Time</th>
+                <th>Temperature</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if latest_data_list %}
+                {% for data in latest_data_list %}
+                    <tr>
+                        <td>{{ data.device.id }}</td>
+                        <td>{{ data.device.info }}</td>
+                        <td>{{ data.collection_date }}</td>
+                        <td>{{ data.temperature }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+
+            
+            
+              
+        </tbody>
+    </table>
+
+    {% endblock content %}
+
+
+    {% block script %}
+
+    <!-- This ajax script updates data_table1 in data_table.html static 5s intervals-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script type="text/javascript">
+        //This isn't really thrustworthy implementation, having random generated ids    
+        var ajax_id = Math.floor(Math.random() * 1000);
+
+        setInterval(function() {
+            
+            $.ajax({
+                type: "GET",
+                url: {% url 'update_data_table' %},  // URL to the view that updates data_table1
+                data : {
+                   "ajax_id" : ajax_id
+                }
+                                
+            })
+            .done(function(response) {
+                $('#data_table1').append(response);
+            
+            });
+
+            
+        }, 1000)
+        </script>
+    {% endblock %}
+
+

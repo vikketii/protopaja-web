@@ -1,0 +1,127 @@
+{% extends "base_generic_older.html" %}
+
+
+
+
+	{% block content %}
+
+
+
+	<h2 align="center"> Latest data </h2>
+	<div>
+		<p> This page shows latest datapoints for each device </p>
+		<p> Get further device information by clicking the device </p>
+	</div>
+	<div id="devices_table_division">
+	<!-- check https://getbootstrap.com/docs/4.0/content/tables/ for table status classes-->
+
+		
+		
+		{% for data in data_objects %}
+		
+	  	<ul class="nav nav-pills nav-fill" ">
+	  	<li class="nav-item">
+	    <a class="nav-link active" href="/devices/modify_devices?device_id={{data.device.id}}">{{data.device.info}}</a>
+	  	</li>
+	  	</ul>
+
+	  		<table id="device_table" class="display" cellspacing="0" width="100%">
+	  		{% if data.temperature < 26 and data.humidity < 51 %}
+		  		<tbody>
+		  			{% if data.device.user_notes != None %}
+		  				<tr class="table-success">
+		  					<td> <b>Description</b></td>
+			  				<td>{{data.device.user_notes}}</td>
+			  			</tr>
+			  		{% endif %}
+
+			  		<tr class="table-success">
+
+			  			
+			  			<td> <b>Collection time </b></td>
+			  			<td>{{data.collection_date}}</td>
+			  			
+			  		</tr>
+			  		<tr class="table-success">
+			  			<td> <b> Temperature </b></td>
+			  			<td><font color="green">{{data.temperature}}  &#8451 </font></td>
+			  			
+			  		</tr>
+			  		<tr class="table-success">
+			  			<td> <b>Humidity </b></td>
+			  			<td> <font color="green">{{data.humidity}} &percnt; </font></td>
+			  			
+		  			</tr>
+		  			
+		  		</tbody>
+
+	  		{% else %}
+	  			<tbody>
+
+	  				{% if data.device.user_notes != None %}
+	  					<tr class="table-danger">
+		  					<td> <b>Description</b></td>
+			  				<td>{{data.device.user_notes}}</td>
+			  			</tr>
+			  		{% endif %}
+
+			  		<tr class="table-danger">
+			  			
+			  			<td> <b>Collection time </b></td>
+			  			<td>{{data.collection_date}}</td>
+			  			
+			  		</tr>
+			  		
+			  		<tr class="table-danger">
+			  			<td> <b>Temperature </b></td>
+			  			{% if data.temperature > 25 %}
+			  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
+			  			{% else %}
+			  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+			  			{% endif %}
+			  		</tr>
+			  		<tr class="table-danger">
+			  			<td> <b>Humidity </b></td>
+			  			{% if data.humidity > 50 %}
+			  				<td><font color="red">{{data.humidity}} &percnt; </font></td>
+			  			{% else %}
+			  				<td><font color="green">{{data.humidity}} &percnt; </font></td>
+			  			{% endif %}		  			
+		  			</tr>
+
+	  			</tbody>
+	  		{% endif %}
+	  	</table>
+	  		
+	  	{% endfor %}
+
+	 </div>
+
+	
+
+	{% endblock content %}
+	{% block script %}
+
+    <!-- This ajax script updates device table in the div static 1s intervals-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script type="text/javascript">
+           
+       
+
+        setInterval(function() {
+            
+            $.ajax({
+                type: "GET",
+                url: {% url 'new_device_content' %},  // URL to the view that updates the table
+             
+                                
+            })
+            .done(function(response) {
+                $('#devices_table_division').html(response);
+            
+            });
+
+            
+        }, 1000)
+        </script>
+    {% endblock %}

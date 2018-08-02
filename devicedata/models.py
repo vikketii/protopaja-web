@@ -1,5 +1,7 @@
 from django.db import models
 
+# for unique device id's
+import uuid
 
 class Device(models.Model):
     """
@@ -7,7 +9,11 @@ class Device(models.Model):
     """
     id = models.IntegerField(primary_key=True)
     info = models.CharField(max_length=200)
+    user_notes = models.CharField(max_length=200, default=None, blank=True, null=True) #user can set any info to this field
 
+
+   
+    
     def __str__(self):
         return 'Device: {0}' .format(self.info)
 

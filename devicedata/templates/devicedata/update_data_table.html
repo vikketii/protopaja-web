@@ -1,0 +1,14 @@
+
+<!-- This html file is used to update data_table.html:
+ data_table1-->
+
+{% if latest_data_list %}
+    {% for data in latest_data_list %}
+        <tr>
+            <td>{{ data.device.id }}</td>
+            <td>{{ data.device.info }}</td>
+            <td>{{ data.collection_date }}</td>
+            <td>{{ data.temperature }}</td>
+        </tr>
+    {% endfor %}
+{% endif %}
