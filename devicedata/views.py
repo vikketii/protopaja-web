@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.views import generic
 
@@ -80,3 +80,12 @@ def get_data(request):
 
     # To get safe=True, we would have to write our own serializer
     return JsonResponse(({'data': data_list}), safe=False)
+
+
+def device(request, id):
+    try:
+        device = Device.objects.get(id=id)
+    except Device.DoesNotExist:
+        raise Http404('Device does not exist')
+
+    return HttpResponse('Device found')
