@@ -62,7 +62,7 @@ $.when(
                 console.log(error_data)
             }
         })
-    }, 2000) // update interval in milliseconds
+    }, 1000) // update interval in milliseconds
 })
 
 
@@ -101,7 +101,7 @@ function setHumidityChart(data){
                 pointBorderColor: 'rgb(75, 192, 192)',
                 pointBackgroundColor: 'rgb(75, 192, 192)',
                 fill: false,
-                lineTension: 0.1,
+                lineTension: 0.1, // 0: draw straight lines
             }]
         },
         options: {
@@ -221,7 +221,7 @@ function updateChart(chart, data) {
             }
         })
         // 0 disables animation
-        chart.update(0)
+        chart.update()
 }
 
 

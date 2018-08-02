@@ -13,8 +13,8 @@ client = requests.session()
 n = 1
 
 # Retrieve CSRF token, this doesn't seem to work
-client.get("http://127.0.0.1:8000/admin") # sets cookie
-csrftoken = client.cookies['csrftoken']
+# client.get("http://127.0.0.1:8000/admin") # sets cookie
+# csrftoken = client.cookies['csrftoken']
 
 #login_data = dict(username='testi', password='prototesti', csrfmiddlewaretoken=csrftoken, next='/')
 
@@ -30,7 +30,7 @@ while True:
     data = {
         "username": 'testi',
         "password" : 'prototesti',
-        "csrfmiddlewaretoken" : csrftoken,
+        #"csrfmiddlewaretoken" : csrftoken,
         "device_id" : device_id,
         "collection_date" : collection_date,
         "pollution" : pollution,

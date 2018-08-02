@@ -35,3 +35,9 @@ Chart.js: Draw charts from data.
 		- Pollution : Pollution data. _(numbers/labels)?_
 		- Temp : Temperature as float.
 		- Humidity : Humidity as int.
+
+
+
+## Future improvements
+1. Customer model
+Storing customer data. Login information, devices owned, email etc.
