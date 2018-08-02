@@ -48,7 +48,9 @@ $.when(
                 if (charts[0].data.labels[0] != data.data[0].date) {
                     // update time
                     time_data.unshift(data.data[0].date)
-                    time_data.pop()
+                    if (time_data.length > 30) { 
+                        time_data.pop()
+                    }
                     // update charts
                     for (var i in charts) {
                         updateChart(charts[i], data)
@@ -201,7 +203,9 @@ function updateChart(chart, data) {
             if (dataset.name == 'temperature') {
                 // update measurements
                 dataset.data.unshift(data.data[0].temperature)
-                dataset.data.pop()
+                if (dataset.data.length > 30) { 
+                    dataset.data.pop()
+                }
 
                 // update limit colors
                 var colours = dataset.data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red')
@@ -211,7 +215,9 @@ function updateChart(chart, data) {
             else if (dataset.name == 'humidity') {
                 // update measurements
                 dataset.data.unshift(data.data[0].humidity)
-                dataset.data.pop()
+                if (dataset.data.length > 30) { 
+                    dataset.data.pop()
+                }
             }
         })
         // 0 disables animation
