@@ -1,0 +1,93 @@
+{% extends "base_generic_older.html" %}
+
+
+{% block content %}
+
+	<!-- https://getbootstrap.com/docs/4.0/components/input-group/ -->
+
+	
+	<div>
+		<table id="data_table1" class="display" cellspacing="0" width="100%">
+	        <thead>
+	            <tr>
+	                <th>Device</th>
+	                <th>Device info</th>
+	                <th>Description</th>
+	                <th>Time</th>
+	                <th>Temperature</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            {% if latest_data_list %}
+	                {% for data in latest_data_list %}
+	                    <tr>
+	                        <td>{{ data.device.id }}</td>
+	                        <td>{{ data.device.info }}</td>
+	                        <td>{{ data.device.user_notes }}</td>
+	                        <td>{{ data.collection_date }}</td>
+	                        <td>{{ data.temperature }}</td>
+	                    </tr>
+	                {% endfor %}
+	            {% endif %}
+
+	            
+	            
+	              
+	        </tbody>
+	    </table>
+	</div>
+
+	<div>
+		<br />
+		<br />
+		<br />
+		<form action="{% url 'update_info' %}" method="POST"> 
+		  Device Description:<br>
+		  <br />
+		  <input type="text" name="info" value="" class="form-control" placeholder="Set description" aria-label="Set description" aria-describedby="basic-addon2">
+		  <input type="hidden" value="{{id}}" name="device_id"/>
+		  <!--<input type="hidden" value="{{device}}" name="device"/>-->
+		  <br>
+		  
+		  <input type="submit" value="Submit">
+		  {% csrf_token %} 
+		</form> 
+	</div>
+
+	<!--<div class="input-group mb-3">
+
+		  <input type="text" id="user_info" class="form-control" placeholder="Set general info" aria-label="Set general info" aria-describedby="basic-addon2">
+		  <div class="input-group-append">
+		    <button class="btn btn-outline-secondary" id="set_button" type="button">Set</button>
+		  </div>
+	</div> -->
+
+	<form>
+		<br />
+		<br />
+		<br />
+		<div class="form-row align-items-center">
+		    <div class="col-auto my-1">
+		      <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label>
+		      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
+		        <option selected>Choose...</option>
+		        <option value="1">One</option>
+		        <option value="2">Two</option>
+		        <option value="3">Three</option>
+		      </select>
+		    </div>
+		    <div class="col-auto my-1">
+		      <div class="custom-control custom-checkbox mr-sm-2">
+		        <input type="checkbox" class="custom-control-input" id="customControlAutosizing">
+		        <label class="custom-control-label" for="customControlAutosizing">Remember my preference</label>
+		      </div>
+		    </div>
+		    <div class="col-auto my-1">
+		      <button type="submit" class="btn btn-primary">Submit</button>
+		    </div>
+		</div>
+	</form>
+
+{% endblock content %}
+
+

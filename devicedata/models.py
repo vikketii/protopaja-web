@@ -3,11 +3,11 @@ from django.db import models
 
 class Device(models.Model):
     """
-    Model representing slave device
+    Model representing slave device.
     """
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    info = models.CharField(max_length=400, blank=True)
+    info = models.CharField(max_length=100)
+    user_notes = models.CharField(max_length=200, blank=True) #user can set any info to this field
 
     def __str__(self):
         return 'Device: {0}' .format(self.info)
