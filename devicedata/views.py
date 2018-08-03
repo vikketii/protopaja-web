@@ -8,7 +8,7 @@ from .models import Data, Device
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
-
+import datetime
 """
 class IndexView(generic.ListView):
     template_name = 'devicedata/index.html'
@@ -44,10 +44,12 @@ def data_table(request):
     num = 5
     obs = Data.objects.all()
     val = obs.count()
-    latest_data_list = Data.objects.order_by('collection_date')[val-num:val]
-        
+    data_object = Data.objects.none()
+    if val:
+    	data_object = Data.objects.latest('collection_date')
+    	        
     context = {
-        'latest_data_list': latest_data_list,
+        'data_object': data_object
     }
     return render(request, 'devicedata/data_table.html', context)
 
@@ -75,18 +77,19 @@ def update_data_table(request):
             if ajax_ids[ajax_id] < data:
                 obs = Data.objects.all()
                 val = obs.count()
-
-                latest_data_list = Data.objects.order_by('collection_date')[val-1:val]
-                #latest_data_list = Data.objects.last()
-                context = {
-                    'latest_data_list': latest_data_list,
-                 }
+                data_object = Data.objects.none()
+                if val:
+                	data_object = Data.objects.latest('collection_date')
+                	context = {
+			        	'data_object': data_object
+			    	}
     
-                ajax_ids[ajax_id] = data
-                return render(request, 'devicedata/update_data_table.html', context)
+                	ajax_ids[ajax_id] = data
+                	return render(request, 'devicedata/update_data_table.html', context)   		        
+			    	
             else:
                 context = {
-                    'latest_data_list': Data.objects.none(),
+                    'data_object': Data.objects.none(),
                  }
                 return render(request,'devicedata/update_data_table.html', context)
             
@@ -235,4 +238,71 @@ def update_info(request):
         'id' : device_id
         }
         return render(request, 'devicedata/modify_devices.html', context)
+
+        
+# not requiring csrf
+@csrf_exempt
+
+# requires login and redirects to /accounts/login/ if not logged in
+#@login_required
+def send_string(request):
+      
+    if request.method == 'POST':
+        data_body = request.body.decode('utf-8')
+                
+        new_data = data_body.split(',')
+        
+
+        for i in range(0,len(new_data)):
+            content = new_data[i].split(':')
+            clean_content = content[0].strip()
+
+            if clean_content == 'username':
+                username = content[1].strip()
+                
+
+            elif clean_content == 'password':
+                password = content[1].strip()
+
+            elif clean_content == 'device_id':
+                device_id = content[1].strip()
+
+            elif clean_content == 'temp':
+                temp = content[1].strip()
+
+            elif clean_content == 'humd':
+                humd = content[1].strip()
+
+            elif clean_content == 'dust':
+                dust = content[1].strip()
+
+            elif clean_content == 'light':
+                light = content[1].strip()
+
+                
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            #authentication succesfull
+            login(request, user)
+
+            try:
+                # try to find the correct object
+                device = Device.objects.get(id = int(device_id))
+
+            except Device.DoesNotExist:
+                # a new slave module, create a new device object
+                device = Device.objects.create(info='Sensor station '+ device_id, id = int(device_id))
+            
+
+            finally:
+                # create a new data object for the correct device
+                time = datetime.datetime.now()
+                data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
+                global data
+                data += 1
+                return HttpResponse(data_object)
+
+    # incorrect username/password
+    return HttpResponse('Unauthorized request')
         
