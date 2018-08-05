@@ -6,7 +6,7 @@
 	<!-- https://getbootstrap.com/docs/4.0/components/input-group/ -->
 
 	
-	<div>
+	<div id="table_data">
 		<table id="data_table1" class="display" cellspacing="0" width="100%">
 	        <thead>
 	            <tr>
@@ -46,6 +46,7 @@
 		  <br />
 		  <input type="text" name="info" value="" class="form-control" placeholder="Set description" aria-label="Set description" aria-describedby="basic-addon2">
 		  <input type="hidden" value="{{id}}" name="device_id"/>
+		  <input type="hidden" value="{{num}}" name="num"/>
 		  <!--<input type="hidden" value="{{device}}" name="device"/>-->
 		  <br>
 		  
@@ -62,23 +63,31 @@
 		  </div>
 	</div> -->
 
-	<form>
+	<form action="{% url 'update_select' %}" method="POST">
+		{% csrf_token %} 
 		<br />
 		<br />
 		<br />
 		<div class="form-row align-items-center">
 		    <div class="col-auto my-1">
-		      <label class="mr-sm-2" for="inlineFormCustomSelect">Preference</label>
-		      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect">
-		        <option selected>Choose...</option>
-		        <option value="1">One</option>
-		        <option value="2">Two</option>
-		        <option value="3">Three</option>
-		      </select>
+	    	
+		    	<label class="mr-sm-2" for="inlineFormCustomSelect">Data points</label>
+		      	<select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="select_value">
+			        <option selected>Choose...</option>
+			        <option value="1">1</option>
+			        <option value="3">3</option>
+			        <option value="5">5</option>
+			        <option value="10">10</option>
+			        <option value="20">20</option>
+			        <option value="50">50</option>
+			        <option value="100">100</option>
+		      	</select>
+				  
 		    </div>
 		    <div class="col-auto my-1">
 		      <div class="custom-control custom-checkbox mr-sm-2">
-		        <input type="checkbox" class="custom-control-input" id="customControlAutosizing">
+		        <input type="checkbox" class="custom-control-input" id="customControlAutosizing" name="state" value="True">
+		        <input type="hidden" value="{{id}}" name="device_id"/>
 		        <label class="custom-control-label" for="customControlAutosizing">Remember my preference</label>
 		      </div>
 		    </div>
@@ -89,5 +98,33 @@
 	</form>
 
 {% endblock content %}
+
+<script>
+	{% block script %}
+    // This ajax script updates device table in the div static 1s intervals
+
+    	var id = "{{id}}";
+    	var num = "{{num}}";
+        setInterval(function() {
+            
+            $.ajax({
+                type: "GET",
+                url: {% url 'devices_refresh' %},  // URL to the view that updates the table
+       			data : {
+                   "device_id" : id,
+                   "datapoints" : num
+                }
+                                
+            })
+            .done(function(response) {
+                $('#table_data').html(response);
+            
+            });
+
+            
+        }, 1000)
+
+    {% endblock %}
+</script>
 
 
