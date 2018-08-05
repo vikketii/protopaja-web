@@ -9,6 +9,7 @@ from .models import Data, Device
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 import datetime
+from django.shortcuts import redirect
 """
 class IndexView(generic.ListView):
     template_name = 'devicedata/index.html'
@@ -22,6 +23,8 @@ class IndexView(generic.ListView):
 data = 0
 val = 5
 ajax_ids = {}
+
+
 
 
 def index(request):
@@ -183,14 +186,26 @@ def modify_devices(request):
         devices = Device.objects.select_related().filter(id = device_id)
         
         data = Data.objects.select_related().filter(device = devices[0])
-        global val
-        latest_data = data.order_by('-collection_date')[:val]
+
+        if devices[0].preference:
+        	#user has defined amount of datapoints
+        	latest_data = data.order_by('-collection_date')[:devices[0].datapoints]
+        	num = devices[0].datapoints
+        else:
+        	#use standard amount
+	        global val
+	        latest_data = data.order_by('-collection_date')[:val]
+	        # remember to update datapoints to standard set point if there is no preference
+	        devices[0].datapoints = val
+	        devices[0].save(update_fields=['datapoints'])
+	        num = val
         
         #devices = Device.objects.all()
         context = {
-        'device' : devices,
+        'device' : devices[0],
         'latest_data_list' : latest_data,
-        'id' : device_id
+        'id' : device_id,
+        'num' : num
         }
         return render(request, 'devicedata/modify_devices.html', context)
 
@@ -220,7 +235,8 @@ def update_info(request):
         device_id = request.POST.get('device_id',None)
         devices = Device.objects.all()
         device = devices.select_related().filter(id=device_id)
-        
+        num = request.POST.get('num',None)
+
         if device:
             # update user_notes
             device[0].user_notes = info
@@ -228,16 +244,22 @@ def update_info(request):
           
         # go back to modify devices page
         data = Data.objects.select_related().filter(device = device[0])
-        global val
-        latest_data = data.order_by('-collection_date')[:val]
+        latest_data = data.order_by('-collection_date')[:int(num)]
         
         #devices = Device.objects.all()
         context = {
-        'device' : devices,
+        'device' : device[0],
         'latest_data_list' : latest_data,
-        'id' : device_id
+        'id' : device_id,
+        'num' :num
         }
         return render(request, 'devicedata/modify_devices.html', context)
+
+    # get request, user refreshed page, redirect to all devices
+    return redirect('all_devices')
+
+
+    
 
         
 # not requiring csrf
@@ -293,7 +315,7 @@ def send_string(request):
             except Device.DoesNotExist:
                 # a new slave module, create a new device object
                 device = Device.objects.create(info='Sensor station '+ device_id, id = int(device_id))
-            
+
 
             finally:
                 # create a new data object for the correct device
@@ -305,4 +327,131 @@ def send_string(request):
 
     # incorrect username/password
     return HttpResponse('Unauthorized request')
+
+def devices_refresh(request):
+		if request.method == 'GET' and request.is_ajax():
+			device_id = int(request.GET.get('device_id',None))
+			datapoints = int(request.GET.get('datapoints',None))
+			devices = Device.objects.select_related().filter(id = device_id)
+			data = Data.objects.select_related().filter(device = devices[0])
+			#print(devices[0].datapoints)
+			latest_data = data.order_by('-collection_date')[:datapoints]
+			content = {
+	        	'device' : devices[0],
+	        	'latest_data_list' : latest_data,
+	        	'id' : device_id
+	        }
+			return render(request, 'devicedata/modify_devices_refresh.html', content)
+
+
+
+def update_select(request):
+	if request.method == 'POST':
+		value = request.POST.get('select_value')
+		device_id = request.POST.get('device_id')
+		state = request.POST.get('state')
+		# if state == True, user wants to always see val number objects
+		#print(value)
+		#print(device_id)
+		#print(state)
+
+		try:
+			device = Device.objects.get(id=int(device_id))
+			value = int(value)
+			if state:
+				# preference to True
+				device.preference = True
+				device.datapoints = value
+				
+			else:
+				device.preference = False
+				device.datapoints = value
+				
+			device.save(update_fields=['preference', 'datapoints'])
+
+		except ValueError:
+			# not int value selected
+			pass
+
+		finally:
+			# render modify_devices.html again
+			data = Data.objects.select_related().filter(device = device)
+			latest_data = data.order_by('-collection_date')[:device.datapoints]
+			content = {
+		        'device' : device,
+		        'latest_data_list' : latest_data,
+		        'id' : device_id,
+		        'num' : device.datapoints
+        	}
+
+			return render(request,'devicedata/modify_devices.html',content)
+
+	else:
+		# if user reloaded the page, redirect to all devices
+		 return redirect('all_devices')
+
+
+			
+    		
+			
+			
+
+	
+	        	
+	        
+	        
+	        
+
+    		        
+	        		
+        	
+
+
+	
+		
+		
+			
+			
+				
+				
+
+				
+				
+			
+				
+
+
+		
+			
+
+		
+			
+			
+			
+        	
+	
+			
+			
+			
+        	
+
+
+
+    
+
+        
+        
+        
+        
+
+        
+        
+        
+        
+		
+
+
+	
+	
+    
         
