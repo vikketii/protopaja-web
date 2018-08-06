@@ -12,9 +12,12 @@
 	            <tr>
 	                <th>Device</th>
 	                <th>Device info</th>
-	                <th>Description</th>
+	                <!--<th>Description</th>-->
 	                <th>Time</th>
 	                <th>Temperature</th>
+	                <th>Dust</th>
+	                <th>Humidity</th>
+	                <th>Light</th>
 	            </tr>
 	        </thead>
 	        <tbody>
@@ -23,9 +26,13 @@
 	                    <tr>
 	                        <td>{{ data.device.id }}</td>
 	                        <td>{{ data.device.info }}</td>
-	                        <td>{{ data.device.user_notes }}</td>
+	                        <!--<td>{{ data.device.user_notes }}</td>-->
 	                        <td>{{ data.collection_date }}</td>
 	                        <td>{{ data.temperature }}</td>
+	                        <td>{{ data.dust }}</td>
+	                        <td>{{ data.humidity }}</td>
+	                        <td>{{ data.light }}</td>
+
 	                    </tr>
 	                {% endfor %}
 	            {% endif %}
@@ -42,7 +49,7 @@
 		<br />
 		<br />
 		<form action="{% url 'update_info' %}" method="POST"> 
-		  Device Description:<br>
+		  Device Description: <b>{{ device.user_notes }}</b><br>
 		  <br />
 		  <input type="text" name="info" value="" class="form-control" placeholder="Set description" aria-label="Set description" aria-describedby="basic-addon2">
 		  <input type="hidden" value="{{id}}" name="device_id"/>

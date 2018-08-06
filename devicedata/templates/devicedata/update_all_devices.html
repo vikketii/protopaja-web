@@ -7,7 +7,7 @@
 	  	</ul>
 
 	  		<table id="device_table" class="display" cellspacing="0" width="100%">
-	  		{% if data.temperature < 26 and data.humidity < 51 %}
+	  		{% if data.temperature < 26 and data.humidity < 51 and data.dust < 25 %}
 		  		<tbody>
 
 		  			{% if data.device.user_notes != None %}
@@ -26,6 +26,11 @@
 			  		<tr class="table-success">
 			  			<td> <b> Temperature </b></td>
 			  			<td><font color="green">{{data.temperature}}  &#8451 </font></td>
+			  			
+			  		</tr>
+			  		<tr class="table-success">
+			  			<td> <b> Dust particles</b></td>
+			  			<td><font color="green">{{data.dust}}  pcs &sol; ml </font></td>
 			  			
 			  		</tr>
 			  		<tr class="table-success">
@@ -60,6 +65,14 @@
 			  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
 			  			{% else %}
 			  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+			  			{% endif %}
+			  		</tr>
+			  		<tr class="table-danger">
+			  			<td> <b>Dust particles</b></td>
+			  			{% if data.dust > 24 %}
+			  				<td><font color="red">{{data.dust}} pcs &sol; ml </font></td>
+			  			{% else %}
+			  				<td><font color="green">{{data.dust}} pcs &sol; ml </font></td>
 			  			{% endif %}
 			  		</tr>
 			  		<tr class="table-danger">
