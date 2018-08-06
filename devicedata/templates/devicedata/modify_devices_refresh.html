@@ -3,9 +3,12 @@
         <tr>
             <th>Device</th>
                 <th>Device info</th>
-                <th>Description</th>
+                <!--<th>Description</th>-->
                 <th>Time</th>
                 <th>Temperature</th>
+                <th>Dust</th>
+                <th>Humidity</th>
+                <th>Light</th>
             </tr>
     </thead>
     <tbody>
@@ -14,9 +17,13 @@
                 <tr>
                     <td>{{ data.device.id }}</td>
                     <td>{{ data.device.info }}</td>
-                    <td>{{ data.device.user_notes }}</td>
+                    <!--<td>{{ data.device.user_notes }}</td>-->
                     <td>{{ data.collection_date }}</td>
                     <td>{{ data.temperature }}</td>
+                    <td>{{ data.dust }}</td>
+                    <td>{{ data.humidity }}</td>
+                    <td>{{ data.light }}</td>
+
                 </tr>
             {% endfor %}
         {% endif %}
