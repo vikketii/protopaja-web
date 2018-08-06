@@ -8,7 +8,7 @@ import sys
 
 
 # typo fixed in the url
-myurl = "http://127.0.0.1:8000/send-json/"
+myurl = "http://167.99.139.198/send-json/"
 client = requests.session()
 n = 1
 
@@ -25,7 +25,7 @@ while True:
     collection_date = datetime.datetime.now()
     device_id = '1'
 
-    
+
     #json object, didn't get inner json working -> only 1 json
     data = {
         "username": 'testi',
@@ -36,10 +36,10 @@ while True:
         "pollution" : pollution,
         "temperature" : temperature,
         "humidity" : humidity
-         
+
     }
     header = {'content-type': 'application/json'}
-    
+
     # json.dumps(default=str) is "dirty" way to convert unindentified objects to string
 
     response = client.post(myurl, data=data)
