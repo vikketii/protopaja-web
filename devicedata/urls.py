@@ -14,4 +14,7 @@ urlpatterns = [
     path('devices/modify_devices/', views.modify_devices, name='modify_devices'),
     path('new_device_content/', views.new_device_content, name='new_device_content'),
     path('update_info/', views.update_info, name='update_info'),
+    path('send_string/', views.send_string, name='send_string'),
+    path('update_select/', views.update_select, name='update_select'),
+    path('devices_refresh/', views.devices_refresh, name='devices_refresh')
 ]

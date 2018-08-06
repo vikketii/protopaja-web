@@ -11,15 +11,15 @@
             </tr>
         </thead>
         <tbody>
-            {% if latest_data_list %}
-                {% for data in latest_data_list %}
+            {% if data_object %}
+                
                     <tr>
-                        <td>{{ data.device.id }}</td>
-                        <td>{{ data.device.info }}</td>
-                        <td>{{ data.collection_date }}</td>
-                        <td>{{ data.temperature }}</td>
+                        <td>{{ data_object.device.id }}</td>
+                        <td>{{ data_object.device.info }}</td>
+                        <td>{{ data_object.collection_date }}</td>
+                        <td>{{ data_object.temperature }}</td>
                     </tr>
-                {% endfor %}
+                
             {% endif %}
 
             

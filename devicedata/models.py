@@ -8,6 +8,9 @@ class Device(models.Model):
     id = models.IntegerField(primary_key=True)
     info = models.CharField(max_length=100)
     user_notes = models.CharField(max_length=200, blank=True) #user can set any info to this field
+    # these are used in displaying user defined amount of data points
+    datapoints = models.IntegerField(default=5)
+    preference = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Device: {0}' .format(self.info)
