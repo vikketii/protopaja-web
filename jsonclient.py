@@ -8,7 +8,7 @@ import sys
 
 
 # typo fixed in the url
-myurl = "http://167.99.139.198/send-json/"
+myurl = "http://127.0.0.1:8000/send-json/"
 client = requests.session()
 n = 1
 
