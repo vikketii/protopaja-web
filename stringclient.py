@@ -20,7 +20,8 @@ while True:
     temperature = random.randint(20, 28)
     humidity = random.randint(30, 70)
     light = random.randint(0,9)
-    device_id = '2'
+    device_id = str(random.randint(1,3))
+    #device_id = '2'
 
     
 
