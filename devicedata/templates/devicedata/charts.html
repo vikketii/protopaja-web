@@ -48,7 +48,7 @@ $.when(
                 if (charts[0].data.labels[0] != data.data[0].date) {
                     // update time
                     time_data.unshift(data.data[0].date)
-                    if (time_data.length > 30) { 
+                    if (time_data.length > 100) { 
                         time_data.pop()
                     }
                     // update charts
@@ -68,7 +68,7 @@ $.when(
 
 function getChartDatas(data){
     // Limits datapoints to n
-    var n = 30
+    var n = 100
     if (data.data.length < n){
         n = data.data.length
     }
@@ -91,107 +91,120 @@ function setCharts(data){
 function setHumidityChart(data){
     var ctx = document.getElementById("humidity_chart");
 
+    var data = {
+        labels: time_data,
+        datasets: [{
+            name: 'humidity',
+            data: humidity_data,
+            pointBorderColor: 'rgb(75, 192, 192)',
+            pointBackgroundColor: 'rgb(75, 192, 192)',
+            fill: false,
+            lineTension: 0.1, // 0: draw straight lines
+        }]
+    }
+
+    var options = {
+        legend: {
+            display: false,
+        },
+        title: {
+            display: true,
+            text: 'Humidity',
+            fontSize: 16,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    suggestedMin: 1940,
+                    suggestedMax: 2160,
+                }
+            }],
+           xAxes: [{
+                ticks: {
+                    maxRotation: 20,
+                    maxTicksLimit: 6,
+                },
+
+                type: 'time',
+                // data is spread at the same distance from each other, not according to time
+                time: {
+                    unit: 'minute',
+                    tooltipFormat: 'DD/MM/YY - HH:mm:ss',
+                    displayFormats: {
+                        'minute': 'DD/MM/YY - HH:mm',
+                    }
+                }
+            }]
+        }
+    }
+
     var humidity_chart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: time_data,
-            datasets: [{
-                name: 'humidity',
-                data: humidity_data,
-                pointBorderColor: 'rgb(75, 192, 192)',
-                pointBackgroundColor: 'rgb(75, 192, 192)',
-                fill: false,
-                lineTension: 0.1, // 0: draw straight lines
-            }]
-        },
-        options: {
-            legend: {
-                display: false,
-            },
-            title: {
-                display: true,
-                text: 'Humidity',
-                fontSize: 16,
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 1940,
-                        suggestedMax: 2160,
-                    }
-                }],
-                xAxes: [{
-                    ticks: {
-                        source: 'data',
-                    },
-                    type: 'time',
-                    bounds: 'ticks',
-                    // data is spread at the same distance from each other, not according to time
-                    distribution: 'series',
-                    time: {
-                        unit: 'second',
-                        displayFormats: {
-                            'second': 'DD/MM/YY - HH:mm:ss',
-                        }
-                    }
-                }]
-            }
-        }
-    });
+        data: data,
+        options: options,
+    })
 
     return humidity_chart
 }
 
 function setTempChart(data){
     var ctx = document.getElementById("temperature_chart");
-    var colours = temperature_data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red');
+    var colours = temperature_data.map((value) => value < 25 ? 'green' : 'red');
+    
+    var data = {
+        labels: time_data,
+        datasets: [{
+            name: 'temperature',
+            data: temperature_data,
+            //pointBorderColor: colours,
+            pointBackgroundColor: colours,
+            fill: false,
+            lineTension: 0.1,
+        }]
+    }
+
+    var options = {
+        legend: {
+            display: false,
+        },
+        title: {
+            display: true,
+            text: 'Temperature (Warning at 25 Celsius)',
+            fontSize: 16,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    suggestedMin: 12,
+                    suggestedMax: 32,
+                }
+            }],
+            xAxes: [{
+                ticks: {
+                    // source: 'labels',
+                    maxRotation: 20,
+                    maxTicksLimit: 6,
+                },
+
+                type: 'time',
+                // data is spread at the same distance from each other, not according to time
+                // distribution: 'series',
+                time: {
+                    unit: 'minute',
+                    tooltipFormat: 'DD/MM/YY - HH:mm:ss',
+                    displayFormats: {
+                        'minute': 'DD/MM/YY - HH:mm',
+                    }
+                }
+            }]
+        }
+    }
+
     var temperature_chart = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: time_data,
-            datasets: [{
-                name: 'temperature',
-                data: temperature_data,
-                pointBorderColor: colours,
-                pointBackgroundColor: colours,
-                fill: false,
-                lineTension: 0.1,
-            }]
-        },
-        options: {
-            legend: {
-                display: false,
-            },
-            title: {
-                display: true,
-                text: 'Temperature (Warning at 25 Celsius)',
-                fontSize: 16,
-            },
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 10,
-                        suggestedMax: 36,
-                    }
-                }],
-                xAxes: [{
-                    ticks: {
-                        source: 'data',
-                    },
-                    type: 'time',
-                    bounds: 'ticks',
-                    // data is spread at the same distance from each other, not according to time
-                    distribution: 'series',
-                    time: {
-                        unit: 'second',
-                        displayFormats: {
-                            'second': 'DD/MM/YY - HH:mm:ss',
-                        }
-                    }
-                }]
-            }
-        }
-    });
+        data: data,
+        options: options,
+    })
 
     return temperature_chart
 }
@@ -203,25 +216,25 @@ function updateChart(chart, data) {
             if (dataset.name == 'temperature') {
                 // update measurements
                 dataset.data.unshift(data.data[0].temperature)
-                if (dataset.data.length > 30) { 
+                if (dataset.data.length > 100) { 
                     dataset.data.pop()
                 }
 
                 // update limit colors
                 var colours = dataset.data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red')
-                dataset.pointBorderColor = colours
+                // dataset.pointBorderColor = colours
                 dataset.pointBackgroundColor = colours
             }
             else if (dataset.name == 'humidity') {
                 // update measurements
                 dataset.data.unshift(data.data[0].humidity)
-                if (dataset.data.length > 30) { 
+                if (dataset.data.length > 100) { 
                     dataset.data.pop()
                 }
             }
         })
         // 0 disables animation
-        chart.update()
+        chart.update(0)
 }
 
 

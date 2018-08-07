@@ -26,7 +26,7 @@ ajax_ids = {}
 
 
 
-
+@login_required
 def index(request):
     latest_data_list = Data.objects.order_by('-collection_date')[:3]
     context = {
@@ -34,12 +34,13 @@ def index(request):
     }
     return render(request, 'devicedata/index.html', context)
 
+@login_required
 def charts(request):
     context = {}
     return render(request, 'devicedata/charts.html', context)
 
 
-
+@login_required
 def data_table(request):
 
     # This returns 5 most latest data objects to the table
@@ -57,7 +58,7 @@ def data_table(request):
     return render(request, 'devicedata/data_table.html', context)
 
 
-
+@login_required
 def update_data_table(request):
 
     #This get new object that aren't added to the table yet
@@ -128,7 +129,6 @@ def send_json(request):
             except Device.DoesNotExist:
                 # a new slave module, create a new device object
                 device = Device.objects.create(info=('Sensor station '+str(device_id)), id = device_id)
-                return HttpResponse(device)
 
             finally:
                 #device = Device.objects.get(id = device_id)
@@ -141,7 +141,7 @@ def send_json(request):
     # incorrect username/password
     return HttpResponse('Unauthorized request')
 
-
+@login_required
 # API data, in product should require authentication made with Django REST or something similar
 def get_data(request):
     # Get data as dictionary, newest first and limit is 100
@@ -150,7 +150,7 @@ def get_data(request):
     # To get safe=True, we would have to write our own serializer
     return JsonResponse(({'data': data_list}), safe=False)
 
-
+@login_required
 def device(request, id):
     try:
         device = Device.objects.get(id=id)
@@ -159,7 +159,7 @@ def device(request, id):
     return HttpResponse('Device found')
 
 
-
+@login_required
 def all_devices (request):
     devices = Device.objects.all()
    
@@ -178,7 +178,7 @@ def all_devices (request):
     return render(request, 'devicedata/all_devices.html', context)
 
 
-
+@login_required
 def modify_devices(request):
     if request.method == 'GET':
         device_id = request.GET.get('device_id')
@@ -209,9 +209,8 @@ def modify_devices(request):
         }
         return render(request, 'devicedata/modify_devices.html', context)
 
+@login_required
 def new_device_content(request):
-            
-
     if request.method == 'GET' and request.is_ajax():
         devices = Device.objects.all()
         data_objects = []
@@ -227,7 +226,7 @@ def new_device_content(request):
         } 
         return render(request, 'devicedata/update_all_devices.html', context)
 
-
+@login_required
 def update_info(request):
     if request.method == 'POST':
         info = request.POST.get('info')
@@ -328,6 +327,7 @@ def send_string(request):
     # incorrect username/password
     return HttpResponse('Unauthorized request')
 
+@login_required
 def devices_refresh(request):
 		if request.method == 'GET' and request.is_ajax():
 			device_id = int(request.GET.get('device_id',None))
@@ -344,7 +344,7 @@ def devices_refresh(request):
 			return render(request, 'devicedata/modify_devices_refresh.html', content)
 
 
-
+@login_required
 def update_select(request):
 	if request.method == 'POST':
 		value = request.POST.get('select_value')
