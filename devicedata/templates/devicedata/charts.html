@@ -17,7 +17,6 @@
 
 
 {% block content %}
-
 <h1>Charts</h1>
 <canvas id="temperature_chart" width="40" height="18"></canvas>
 <canvas id="humidity_chart" width="40" height="18"></canvas>
@@ -111,10 +110,9 @@ function setHumidityChart(data){
         datasets: [{
             name: 'humidity',
             data: humidity_data,
-            pointBorderColor: 'rgb(75, 192, 192)',
             pointBackgroundColor: 'rgb(75, 192, 192)',
             fill: false,
-            lineTension: 0.1, // 0: draw straight lines
+            lineTension: 0, // 0: draw straight lines
         }]
     }
 
@@ -143,7 +141,7 @@ function setHumidityChart(data){
                 type: 'time',
                 // data is spread at the same distance from each other, not according to time
                 time: {
-                    unit: 'minute',
+                    // unit: 'minute',
                     tooltipFormat: 'DD/MM/YY - HH:mm:ss',
                     displayFormats: {
                         'minute': 'DD/MM/YY - HH:mm',
@@ -174,7 +172,7 @@ function setTempChart(data){
             //pointBorderColor: colours,
             pointBackgroundColor: colours,
             fill: false,
-            lineTension: 0.1,
+            lineTension: 0,
         }]
     }
 
@@ -197,20 +195,20 @@ function setTempChart(data){
             xAxes: [{
                 ticks: {
                     // source: 'labels',
-                    maxRotation: 20,
+                    maxRotation: 70,
                     maxTicksLimit: 6,
                 },
 
                 type: 'time',
                 // data is spread at the same distance from each other, not according to time
                 // distribution: 'series',
-                time: {
-                    unit: 'minute',
-                    tooltipFormat: 'DD/MM/YY - HH:mm:ss',
-                    displayFormats: {
-                        'minute': 'DD/MM/YY - HH:mm',
-                    }
-                }
+                // time: {
+                //     // unit: 'minute',
+                //     tooltipFormat: 'DD/MM/YY - HH:mm:ss',
+                //     displayFormats: {
+                //         'minute': 'DD/MM/YY - HH:mm',
+                //     }
+                // }
             }]
         }
     }
@@ -237,7 +235,6 @@ function updateChart(chart, data) {
 
                 // update limit colors
                 var colours = dataset.data.map((value) => value < 25 ? 'rgb(75, 192, 192)' : 'red')
-                // dataset.pointBorderColor = colours
                 dataset.pointBackgroundColor = colours
             }
             else if (dataset.name == 'humidity') {

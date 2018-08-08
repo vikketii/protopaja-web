@@ -1,39 +1,41 @@
-{% extends "base_generic.html" %}
+{% extends "base_simple.html" %}
+
 
 {% block content %}
+<div class="login">
+  
 
-{% if form.errors %}
-  <p>Your username and password didn't match. Please try again.</p>
-{% endif %}
 
-{% if next %}
-  {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-  {% else %}
-    <p>Please login to see this page.</p>
-  {% endif %}
-{% endif %}
-
-<form method="post" action="{% url 'login' %}">
+<form method="post" action="{% url 'login' %}" class="form-signin">
 {% csrf_token %}
+  <h1 class="h1 mb-5">Protopaja Consair</h1>
+  
+  {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
+  {% else %}
+    <h2 class="h4 mb-3 font-weight-normal">Please sign in</h2>
+  {% endif %}
 
-<div>
-  <td>{{ form.username.label_tag }}</td>
-  <td>{{ form.username }}</td>
-</div>
-<div>
-  <td>{{ form.password.label_tag }}</td>
-  <td>{{ form.password }}</td>
-</div>
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>Your account doesn't have access to this page. To proceed,
+      please login with an account that has access.</p>
+    {% endif %}
+  {% endif %}
 
-<div>
-  <input type="submit" value="login" />
+  <label for="id_username" class="sr-only">Username</label>
+  <input name="username" type="username" id="id_username" class="form-control" placeholder="Username" required autofocus>
+
+  <label for="id_password" class="sr-only">Password</label>
+  <input name="password" type="password" id="id_password" class="form-control" placeholder="Password" required>
+
+
+  <button class="btn btn-lg btn-primary btn-block" type="submit" value="login">Sign in</button>
   <input type="hidden" name="next" value="{{ next }}" />
-</div>
+
+  <p class="mt-3 mb-3 text-muted">&copy; 2018</p>
+
 </form>
 
-{# Assumes you setup the password_reset view in your URLconf #}
-{# <p><a href="{% url 'password_reset' %}">Lost password?</a></p> #}
-
-{% endblock %}
+</div> 
+{% endblock content %}
