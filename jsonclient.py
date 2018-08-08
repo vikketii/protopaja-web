@@ -11,6 +11,7 @@ import sys
 myurl = "http://127.0.0.1:8000/send-json/"
 client = requests.session()
 n = 1
+temperature = 20
 
 # Retrieve CSRF token, this doesn't seem to work
 # client.get("http://127.0.0.1:8000/admin") # sets cookie
@@ -20,7 +21,7 @@ n = 1
 
 while True:
     pollution = random.choice(["good", "average", "bad"])
-    temperature = random.randint(20, 28)
+    temperature += random.randint(-1, 1)
     humidity = random.randint(2000, 2100)
     collection_date = datetime.datetime.now()
     device_id = '1'
