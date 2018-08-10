@@ -56,7 +56,7 @@ ROOT_URLCONF = 'protopaja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['./templates',],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,14 +124,9 @@ STATIC_URL = '/static/'
 
 
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'protoryhma3@gmail.com'
 EMAIL_HOST_PASSWORD = 'passwd'
 EMAIL_PORT = 587
-
-# Redirect to home URL after login
-LOGIN_REDIRECT_URL = '/'
-

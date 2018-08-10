@@ -122,7 +122,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-
+<<<<<<< HEAD
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -131,7 +131,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'protoryhma3@gmail.com'
 EMAIL_HOST_PASSWORD = 'passwd'
 EMAIL_PORT = 587
-
+=======
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = '/'
-
+>>>>>>> 6ecb5781df7b2f4ad913c000835e0c5c531c0a77
