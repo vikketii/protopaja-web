@@ -52,3 +52,11 @@ class Data(models.Model):
             'humidity': self.humidity,
         }
 
+class Email(models.Model):
+    # These models represent email addresses where warnings should be send to
+
+    address = models.EmailField()
+
+    devices = models.ManyToManyField(Device)
+
+    device_name = models.CharField(max_length=100, null=True)
