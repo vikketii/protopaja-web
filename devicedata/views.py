@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.views import generic
 
-from .models import Data, Device
+from .models import Data, Device, Email
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
@@ -389,3 +389,65 @@ def update_select(request):
 	else:
 		# if user reloaded the page, redirect to all devices
 		 return redirect('all_devices')
+
+@login_required
+def add_emails(request):
+	email_objects = Email.objects.all()
+	devices = Device.objects.all()
+	content = {
+		'email_list' : email_objects,
+		'devices' : devices
+	}
+	return render(request,'devicedata/add_emails.html',content)
+
+@login_required
+def add_email(request):
+	if request.method == 'POST':
+		device = request.POST.get('select_device')
+		email_addr = request.POST.get('email_addr')
+		devices = Device.objects.all()
+
+		if email_addr:
+			# check it's not None
+			email = Email.objects.get(address=email_addr)
+
+			if (email):
+				#destroy the old and create a new
+				email.delete()
+
+			if devices:
+				email = Email.objects.create(address=email_addr)
+
+				if device == 'All':
+					# add all devices
+					for i in range(0,len(devices)):
+						email.devices.add(devices[i])
+
+					email.device_name = 'All'
+					
+
+				else:
+					email.devices.add(devices.get(id=int(device)))
+					email.device_name = devices.get(id=int(device)).info
+					
+				email.save(update_fields=['device_name'])
+			
+
+
+
+		email_objects = Email.objects.all()
+		
+		content = {
+			'email_list' : email_objects,
+			'devices' : devices
+		}
+		return render(request,'devicedata/add_emails.html',content)
+
+	# redirect get methods
+
+	return redirect('warnings')
+
+
+@login_required
+def warnings(request):
+	return render(request, 'devicedata/warnings.html')

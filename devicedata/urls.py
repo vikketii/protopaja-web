@@ -16,5 +16,8 @@ urlpatterns = [
     path('update_info/', views.update_info, name='update_info'),
     path('send_string/', views.send_string, name='send_string'),
     path('update_select/', views.update_select, name='update_select'),
-    path('devices_refresh/', views.devices_refresh, name='devices_refresh')
+    path('devices_refresh/', views.devices_refresh, name='devices_refresh'),
+    path('add_emails/', views.add_emails, name='add_emails'),
+    path('add_email/', views.add_email, name='add_email'),
+    path('warnings/', views.warnings, name='warnings')
 ]
