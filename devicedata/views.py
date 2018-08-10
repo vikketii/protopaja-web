@@ -319,7 +319,7 @@ def send_string(request):
 
             finally:
                 # create a new data object for the correct device
-                time = datetime.datetime.now()
+                time = datetime.datetime.now() + datetime.timedelta(hours=3)
                 data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
                 global data
                 data += 1
