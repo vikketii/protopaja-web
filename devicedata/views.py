@@ -408,56 +408,63 @@ def add_emails(request):
 	devices = Device.objects.all()
 	content = {
 		'email_list' : email_objects,
-		'devices' : devices
+		'devices' : devices,
+        'info' : ''
 	}
 	return render(request,'devicedata/add_emails.html',content)
 
 @login_required
 def add_email(request):
-	if request.method == 'POST':
-		device = request.POST.get('select_device')
-		email_addr = request.POST.get('email_addr')
-		devices = Device.objects.all()
+    if request.method == 'POST':
+        device = request.POST.get('select_device')
+        email_addr = request.POST.get('email_addr')
+        devices = Device.objects.all()
+        email_objects = Email.objects.all()
+        info = ''
 
-		if email_addr:
+
+        if email_addr:
 			# check it's not None
-			email = Email.objects.select_related().filter(address=email_addr)
+            email = Email.objects.select_related().filter(address=email_addr)
 
-			if (email):
+            if (email):
 				#destroy the old and create a new
-				email[0].delete()
+                email[0].delete()
 
-			if devices:
-				email = Email.objects.create(address=email_addr)
+            if devices:
+                if  len(email_objects) < 5:
+                    # this is used to restrict emails to 5
+                    email = Email.objects.create(address=email_addr)
 
-				if device == 'All':
-					# add all devices
-					for i in range(0,len(devices)):
-						email.devices.add(devices[i])
+                    if device == 'All':
+                        # add all devices
+                        for i in range(0,len(devices)):
+                            email.devices.add(devices[i])
 
-					email.device_name = 'All'
-					
+                        email.device_name = 'All'
 
-				else:
-					email.devices.add(devices.get(id=int(device)))
-					email.device_name = devices.get(id=int(device)).info
-					
-				email.save(update_fields=['device_name'])
-			
+                    else:
+                        email.devices.add(devices.get(id=int(device)))
+                        email.device_name = devices.get(id=int(device)).info
+                        
+                    email.save(update_fields=['device_name'])
+                    info = 'Added a new email!'
+    				
+                else:
+                    info = 'Already 5 emails'
 
+        email_objects = Email.objects.all()
+        content = {
+            'email_list' : email_objects,
+            'devices' : devices,
+            'info' : info
+        }
+        return render(request,'devicedata/add_emails.html',content)
 
+    # redirect get methods
 
-		email_objects = Email.objects.all()
-		
-		content = {
-			'email_list' : email_objects,
-			'devices' : devices
-		}
-		return render(request,'devicedata/add_emails.html',content)
+    return redirect('warnings')
 
-	# redirect get methods
-
-	return redirect('warnings')
 
 
 @login_required
@@ -517,3 +524,6 @@ def remove_alarms(request):
     else:
         # was get method, redirect
         return redirect('warnings')
+
+def remove_emails(request):
+    return HttpResponse('moi')

@@ -21,5 +21,6 @@ urlpatterns = [
     path('add_email/', views.add_email, name='add_email'),
     path('warnings/', views.warnings, name='warnings'),
     path('update_warnings/', views.update_warnings, name='update_warnings'),
-    path('remove_alarms/', views.remove_alarms, name='remove_alarms')
+    path('remove_alarms/', views.remove_alarms, name='remove_alarms'),
+    path('remove_emails/', views.remove_emails, name='remove_emails')
 ]

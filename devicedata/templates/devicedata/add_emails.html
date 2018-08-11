@@ -5,8 +5,14 @@
 
 
 
-<h2 align='center'> Add a new warning</h2>
+<h2 align='center'> Add new emails</h2>
 <br/>
+<br/>
+{% ifnotequal info "Already 5 emails" %}
+  <h6> <b><font color="blue">{{info}}</font></b> </h6>
+{% else %}
+  <h6><a href="{% url 'remove_emails' %}"><b><font color="blue">{{info}}, remove an email before adding a new one!</font></b></a></h6>
+{% endifnotequal %}
 <br/>
 <h4>Already added emails</h4>
 <br/>
@@ -22,8 +28,9 @@
 
 <p>
   <br/>
-	<br>Warnings are send to emails specified here</br>
-	<br>Select whether you want all warnings or just the warnings of one sensor station</br>
+	<br>Alarms are send to emails specified here</br>
+	<br>Select whether you want all alarms or just the alarms of one sensor station</br>
+  <br>5 different emails can be provided</br>
   <br>
 </p>
 
