@@ -16,7 +16,7 @@ n = 1
 
 
 while True:
-    dust = random.randint(10,50)
+    dust = random.randint(40,90)
     temperature = random.randint(20, 28)
     humidity = random.randint(30, 70)
     light = random.randint(0,9)
