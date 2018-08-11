@@ -1,5 +1,5 @@
 from django.db import models
-
+import uuid
 
 class Device(models.Model):
     """
@@ -11,6 +11,12 @@ class Device(models.Model):
     # these are used in displaying user defined amount of data points
     datapoints = models.IntegerField(default=5)
     preference = models.BooleanField(default=False)
+
+    dust_warnings = models.IntegerField(default=0) #this is used to detect if warning email needs to be send
+    # this is the value which triggers warning emails
+    dust_set_point = models.IntegerField(default=51) 
+    # this is user defined value that tells how many warnings lead to a warning email and alarm
+    dust_trigger = models.IntegerField(default=2)
 
     def __str__(self):
         return 'Device: {0}' .format(self.info)
@@ -56,7 +62,13 @@ class Email(models.Model):
     # These models represent email addresses where warnings should be send to
 
     address = models.EmailField()
-
     devices = models.ManyToManyField(Device)
-
     device_name = models.CharField(max_length=100, null=True)
+    
+    
+
+class Alarm(models.Model):
+    # This class stores all triggered alarms
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    alarm_type = models.CharField(max_length=200)
+    time = models.DateTimeField()

@@ -19,5 +19,7 @@ urlpatterns = [
     path('devices_refresh/', views.devices_refresh, name='devices_refresh'),
     path('add_emails/', views.add_emails, name='add_emails'),
     path('add_email/', views.add_email, name='add_email'),
-    path('warnings/', views.warnings, name='warnings')
+    path('warnings/', views.warnings, name='warnings'),
+    path('update_warnings/', views.update_warnings, name='update_warnings'),
+    path('remove_alarms/', views.remove_alarms, name='remove_alarms')
 ]

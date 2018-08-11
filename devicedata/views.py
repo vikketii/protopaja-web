@@ -4,12 +4,13 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.views import generic
 
-from .models import Data, Device, Email
+from .models import Data, Device, Email, Alarm
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 import datetime
 from django.shortcuts import redirect
+from .tasks import *
 """
 class IndexView(generic.ListView):
     template_name = 'devicedata/index.html'
@@ -182,32 +183,37 @@ def all_devices (request):
 def modify_devices(request):
     if request.method == 'GET':
         device_id = request.GET.get('device_id')
-        
-        devices = Device.objects.select_related().filter(id = device_id)
-        
-        data = Data.objects.select_related().filter(device = devices[0])
+        if device_id:
+            devices = Device.objects.select_related().filter(id = device_id)
+            
+            data = Data.objects.select_related().filter(device = devices[0])
 
-        if devices[0].preference:
-        	#user has defined amount of datapoints
-        	latest_data = data.order_by('-collection_date')[:devices[0].datapoints]
-        	num = devices[0].datapoints
+            if devices[0].preference:
+            	#user has defined amount of datapoints
+            	latest_data = data.order_by('-collection_date')[:devices[0].datapoints]
+            	num = devices[0].datapoints
+            else:
+            	#use standard amount
+    	        global val
+    	        latest_data = data.order_by('-collection_date')[:val]
+    	        # remember to update datapoints to standard set point if there is no preference
+    	        devices[0].datapoints = val
+    	        devices[0].save(update_fields=['datapoints'])
+    	        num = val
+            
+            #devices = Device.objects.all()
+            context = {
+            'device' : devices[0],
+            'latest_data_list' : latest_data,
+            'id' : device_id,
+            'num' : num
+            }
+            return render(request, 'devicedata/modify_devices.html', context)
+
         else:
-        	#use standard amount
-	        global val
-	        latest_data = data.order_by('-collection_date')[:val]
-	        # remember to update datapoints to standard set point if there is no preference
-	        devices[0].datapoints = val
-	        devices[0].save(update_fields=['datapoints'])
-	        num = val
-        
-        #devices = Device.objects.all()
-        context = {
-        'device' : devices[0],
-        'latest_data_list' : latest_data,
-        'id' : device_id,
-        'num' : num
-        }
-        return render(request, 'devicedata/modify_devices.html', context)
+            return redirect('all_devices')
+
+
 
 @login_required
 def new_device_content(request):
@@ -322,6 +328,12 @@ def send_string(request):
                 data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
                 global data
                 data += 1
+
+                # asyncronously update Devices warnings and check if warning emails need to be send, send those if needed
+                # use celery to do async heavy work -> makes page more responsive
+                # check tasks.py
+            
+                warning_emails.delay(device.info,int(device_id), int(dust),time)
                 return HttpResponse(data_object)
 
     # incorrect username/password
@@ -409,11 +421,11 @@ def add_email(request):
 
 		if email_addr:
 			# check it's not None
-			email = Email.objects.get(address=email_addr)
+			email = Email.objects.select_related().filter(address=email_addr)
 
 			if (email):
 				#destroy the old and create a new
-				email.delete()
+				email[0].delete()
 
 			if devices:
 				email = Email.objects.create(address=email_addr)
@@ -450,4 +462,58 @@ def add_email(request):
 
 @login_required
 def warnings(request):
-	return render(request, 'devicedata/warnings.html')
+    alarms = Alarm.objects.all()
+    if alarms:
+        alarms_sorted = alarms.order_by('-time')
+
+        content = {
+            'alarms' : alarms_sorted
+        }
+    else:
+         content = {
+            'alarms' : None
+        }
+
+    return render(request, 'devicedata/warnings.html', content)
+
+def update_warnings(request):
+    alarms = Alarm.objects.all()
+    if alarms:
+        alarms_sorted = alarms.order_by('-time')
+
+        content = {
+            'alarms' : alarms_sorted
+        }
+    else:
+         content = {
+            'alarms' : None
+        }
+
+    return render(request, 'devicedata/update_warnings.html', content)
+
+def remove_alarms(request):
+    if request.method == 'POST':
+        alarm_id = request.POST.get('alarm_id')
+        
+        alarm = Alarm.objects.get(id=alarm_id)
+        # remove this alarm
+        alarm.delete()
+        # rerender page
+        alarms = Alarm.objects.all()
+        if alarms:
+            alarms_sorted = alarms.order_by('-time')
+
+            content = {
+                'alarms' : alarms_sorted
+            }
+        else:
+             content = {
+                'alarms' : None
+            }
+
+        return render(request, 'devicedata/warnings.html', content)
+        
+
+    else:
+        # was get method, redirect
+        return redirect('warnings')

@@ -1,0 +1,26 @@
+<h2 align='center'><b><font color='red'>Current alarms</font></b></h2>
+<ul class="list-group">
+
+
+  <li class="list-group-item"> </li>
+  {% if alarms %}
+    <form action="{% url 'remove_alarms' %}" method="POST">
+      {% for alarm in alarms %}
+      
+        {% csrf_token %} 
+        <li class="list-group-item list-group-item-danger">
+          <!--This tab usage isn't great -->
+          <font color='red'>{{ alarm.time}}&emsp;&emsp;{{alarm.alarm_type }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</font>
+          <input class="btn btn-danger" type="submit" value="Delete alarm">
+          <input class="btn btn-danger" type="hidden" value="{{alarm.id}}" name="alarm_id">
+        </li> 
+      
+      {% endfor %}
+    </form>
+  {% else %}
+     <li class="list-group-item list-group-item-success">No alarms at the moment</li>
+  {% endif %}
+  
+
+  
+</ul>
