@@ -72,3 +72,7 @@ class Alarm(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     alarm_type = models.CharField(max_length=200)
     time = models.DateTimeField()
+    time_over = models.DateTimeField(null=True) #time when situation normalized
+    time_ack = models.DateTimeField(null=True) #time when alarm was inactivated
+    active = models.BooleanField(default = True) #tells whether alarms is active or not
+    device_id = models.IntegerField(null=True) #link to device

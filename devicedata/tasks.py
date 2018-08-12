@@ -24,15 +24,22 @@ def update_device_warnings(device_id, dust, time):
 			device.dust_warnings += 1
 			device.save(update_fields=['dust_warnings'])
 			if device.dust_warnings == device.dust_trigger:
-				Alarm.objects.create(alarm_type=device.info+': too many dust particles!',time=time)
+				Alarm.objects.create(alarm_type=device.info+': too many dust particles!',time=time, device_id=device_id)
 				return True
 			else:
+
 				return False
 
 
 		else:
 			# dust value was ok, so reset warnings
-			device.dust_warnings = 0 
+			device.dust_warnings = 0
+			device.save(update_fields=['dust_warnings'])
+			alarms = Alarm.objects.select_related().filter(device_id=device_id, time_over=None)
+			for i in range(0,len(alarms)):
+				#add time over to all alarms which are triggered from this device
+				alarms[i].time_over = time
+				alarms[i].save(update_fields=['time_over'])
 			return False
 
 

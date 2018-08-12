@@ -469,7 +469,7 @@ def add_email(request):
 
 @login_required
 def warnings(request):
-    alarms = Alarm.objects.all()
+    alarms = Alarm.objects.select_related().filter(active=True)
     if alarms:
         alarms_sorted = alarms.order_by('-time')
 
@@ -484,7 +484,7 @@ def warnings(request):
     return render(request, 'devicedata/warnings.html', content)
 
 def update_warnings(request):
-    alarms = Alarm.objects.all()
+    alarms = Alarm.objects.select_related().filter(active=True)
     if alarms:
         alarms_sorted = alarms.order_by('-time')
 
@@ -499,31 +499,86 @@ def update_warnings(request):
     return render(request, 'devicedata/update_warnings.html', content)
 
 def remove_alarms(request):
-    if request.method == 'POST':
-        alarm_id = request.POST.get('alarm_id')
-        
-        alarm = Alarm.objects.get(id=alarm_id)
-        # remove this alarm
-        alarm.delete()
-        # rerender page
-        alarms = Alarm.objects.all()
-        if alarms:
-            alarms_sorted = alarms.order_by('-time')
+    
+	try:
+		if request.method == 'POST':
+			alarm_id = request.POST.get('alarm_id')
+		else:
+			alarm_id = request.GET.get('alarm_id')
 
-            content = {
+		alarm = Alarm.objects.get(id=alarm_id)
+		# user acknowledged alarm, inactivate the alarm
+		alarm.time_ack = datetime.datetime.now() + datetime.timedelta(hours=3)
+		alarm.active = False
+		alarm.save(update_fields=['time_ack','active'])
+
+		alarms = Alarm.objects.select_related().filter(active=True)
+		if alarms:
+			alarms_sorted = alarms.order_by('-time')
+			content = {
                 'alarms' : alarms_sorted
             }
-        else:
-             content = {
+		else:
+			content = {
                 'alarms' : None
             }
-
-        return render(request, 'devicedata/warnings.html', content)
+		return render(request, 'devicedata/warnings.html', content)
+		
         
 
-    else:
-        # was get method, redirect
-        return redirect('warnings')
+
+	except Alarm.DoesNotExist:
+		#user reloaded old page
+		return redirect('warnings')
+
+	
 
 def remove_emails(request):
-    return HttpResponse('moi')
+    emails = Email.objects.all()
+    content = {
+    	'emails' : emails
+    }
+    return render(request,'devicedata/remove_emails.html',content)
+
+def remove_email(request):
+	if request.method == 'POST':
+		# this will fail if email_address is not right
+		try:
+			email_address = request.POST.get('email_address')
+			print(email_address)
+			email = Email.objects.get(address=email_address)
+			# delete the email
+			email.delete()
+
+		except Email.DoesNotExist:
+			# user reloaded old page
+			pass
+
+		finally:
+
+			# rerender the page
+			emails = Email.objects.all()
+			content = {
+	    		'emails' : emails
+			}
+			return render(request,'devicedata/remove_emails.html',content)
+
+	# was get request, redirect
+	return redirect('remove_emails')
+
+def show_alarm(request):
+	try:
+		alarm_id = request.GET.get('alarm_id')
+		alarm = Alarm.objects.get(id=alarm_id)
+		content = {
+			'alarm' : alarm,
+			'info' : alarm.alarm_type
+		}
+		return render(request,'devicedata/show_alarm.html',content)
+
+	except Alarm.DoesNotExist:
+		# user reloaded page or did smt unexpected, redirect
+		return redirect('warnings')
+
+
+	

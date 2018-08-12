@@ -1,0 +1,26 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<h2 align="center"> Delete emails</h2>
+
+
+  {% if emails %}
+    
+    	
+      	{% for email in emails %}
+        <form action="{% url 'remove_email' %}" method="POST">
+        	{% csrf_token %} 
+	        <br> <font color='blue'>{{email.address}}</font>
+	          <input class="button" type="hidden" value="{{email.address}}" name="email_address">
+	          <input class="button" style="float: right;" type="submit" value="Delete email">
+	      	</br>
+      	</form>
+      
+      	{% endfor %}
+    
+  {% else %}
+     <li class="list-group-item list-group-item-standard">No emails added yet</li>
+  {% endif %}
+
+
+{% endblock content %}

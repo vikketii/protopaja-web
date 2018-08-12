@@ -22,5 +22,7 @@ urlpatterns = [
     path('warnings/', views.warnings, name='warnings'),
     path('update_warnings/', views.update_warnings, name='update_warnings'),
     path('remove_alarms/', views.remove_alarms, name='remove_alarms'),
-    path('remove_emails/', views.remove_emails, name='remove_emails')
+    path('remove_emails/', views.remove_emails, name='remove_emails'),
+    path('remove_email/', views.remove_email, name='remove_email'),
+    path('show_alarm/', views.show_alarm, name='show_alarm')
 ]

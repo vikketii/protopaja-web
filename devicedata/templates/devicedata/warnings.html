@@ -30,7 +30,7 @@
 
   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
     <a class="dropdown-item" href="{% url 'add_emails' %}">Add emails</a>
-    <a class="dropdown-item" href="#">Delete emails</a>
+    <a class="dropdown-item" href="{% url 'remove_emails' %}">Delete emails</a>
     
   </div>
 </div>
@@ -42,19 +42,18 @@
 
   <li class="list-group-item"> </li>
   {% if alarms %}
-    <form action="{% url 'remove_alarms' %}" method="POST">
+    
       {% for alarm in alarms %}
-      
-        {% csrf_token %} 
-        <li class="list-group-item list-group-item-danger">
-          <!--This tab usage isn't great -->
-          <font color='red'>{{ alarm.time}}&emsp;&emsp;{{alarm.alarm_type }}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</font>
-          <input class="btn btn-danger" type="submit" value="Delete alarm">
-          <input class="btn btn-danger" type="hidden" value="{{alarm.id}}" name="alarm_id">
-        </li> 
+        <form action="{% url 'remove_alarms' %}" method="POST">
+          {% csrf_token %} 
+          <li class="list-group-item list-group-item-danger">
+            <a href="{% url 'show_alarm' %}?alarm_id={{alarm.id}}"><font color='red'>{{ alarm.time}}&emsp;&emsp;{{alarm.alarm_type }}</font></a>
+            <input class="btn btn-danger" style="float: right;" type="submit" value="Inactivate alarm">
+            <input class="btn btn-danger" type="hidden" value="{{alarm.id}}" name="alarm_id">
+          </li> 
+        </form>
       
       {% endfor %}
-    </form>
   {% else %}
      <li class="list-group-item list-group-item-success">No alarms at the moment</li>
   {% endif %}
@@ -84,6 +83,7 @@
 
             
         }, 1000)
+
 
     {% endblock %}
 </script>
