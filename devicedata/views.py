@@ -583,4 +583,39 @@ def show_alarm(request):
 		
 
 def change_alarm_settings(request):
-	return render(request,'devicedata/change_alarm_settings.html')
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(20,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/change_alarm_settings.html',content)
+
+def update_settings(request):
+	success = False
+	if request.method == 'POST':
+		dust = request.POST.get('dust')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].dust_set_point = int(dust)
+				devices[i].dust_trigger = int(crossings)
+				devices[i].save(update_fields=['dust_trigger','dust_set_point'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.dust_set_point = int(dust)
+			device.dust_trigger = int(crossings)
+			device.save(update_fields=['dust_trigger','dust_set_point'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(20,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/change_alarm_settings.html',content)

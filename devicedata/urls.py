@@ -25,5 +25,6 @@ urlpatterns = [
     path('remove_emails/', views.remove_emails, name='remove_emails'),
     path('remove_email/', views.remove_email, name='remove_email'),
     path('show_alarm/', views.show_alarm, name='show_alarm'),
-    path('change_alarm_settings', views.change_alarm_settings, name='change_alarm_settings')
+    path('change_alarm_settings', views.change_alarm_settings, name='change_alarm_settings'),
+    path('update_settings/', views.update_settings, name='update_settings')
 ]
