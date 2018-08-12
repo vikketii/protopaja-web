@@ -14,7 +14,7 @@
     <a class="nav-link" href="{% url 'data_table' %}">Incoming Data</a>
 </li>
 <li class="nav-item active">
-    <a class="nav-link" href="{% url 'warnings' %}">Warnings</a>
+    <a class="nav-link" href="{% url 'warnings' %}">Alarms</a>
 </li>
 {% endblock nav-bar %}
 
@@ -25,12 +25,13 @@
 
 <div class="dropdown show">
   <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-   	Configure warning emails
+   	Configure alarms
   </a>
 
   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
     <a class="dropdown-item" href="{% url 'add_emails' %}">Add emails</a>
     <a class="dropdown-item" href="{% url 'remove_emails' %}">Delete emails</a>
+    <a class="dropdown-item" href="{% url 'change_alarm_settings' %}">Modify alarm settings</a>
     
   </div>
 </div>

@@ -580,5 +580,7 @@ def show_alarm(request):
 		# user reloaded page or did smt unexpected, redirect
 		return redirect('warnings')
 
+		
 
-	
+def change_alarm_settings(request):
+	return render(request,'devicedata/change_alarm_settings.html')
