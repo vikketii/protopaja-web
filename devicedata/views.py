@@ -483,6 +483,7 @@ def warnings(request):
 
     return render(request, 'devicedata/warnings.html', content)
 
+@login_required
 def update_warnings(request):
     alarms = Alarm.objects.select_related().filter(active=True)
     if alarms:
@@ -498,6 +499,7 @@ def update_warnings(request):
 
     return render(request, 'devicedata/update_warnings.html', content)
 
+@login_required
 def remove_alarms(request):
     
 	try:
@@ -532,7 +534,7 @@ def remove_alarms(request):
 		return redirect('warnings')
 
 	
-
+@login_required
 def remove_emails(request):
     emails = Email.objects.all()
     content = {
@@ -540,6 +542,7 @@ def remove_emails(request):
     }
     return render(request,'devicedata/remove_emails.html',content)
 
+@login_required
 def remove_email(request):
 	if request.method == 'POST':
 		# this will fail if email_address is not right
@@ -566,6 +569,7 @@ def remove_email(request):
 	# was get request, redirect
 	return redirect('remove_emails')
 
+@login_required
 def show_alarm(request):
 	try:
 		alarm_id = request.GET.get('alarm_id')
@@ -581,7 +585,7 @@ def show_alarm(request):
 		return redirect('warnings')
 
 		
-
+@login_required
 def change_alarm_settings(request):
 	devices = Device.objects.all()
 	content = {
@@ -591,6 +595,7 @@ def change_alarm_settings(request):
 	}
 	return render(request,'devicedata/change_alarm_settings.html',content)
 
+@login_required
 def update_settings(request):
 	success = False
 	if request.method == 'POST':
@@ -619,3 +624,123 @@ def update_settings(request):
 	 'success' : success
 	}
 	return render(request,'devicedata/change_alarm_settings.html',content)
+
+@login_required
+def change_temp_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(10,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/temp_settings.html',content)
+
+@login_required
+def temp_settings(request):
+	success = False
+	if request.method == 'POST':
+		temp = request.POST.get('temp')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].temp_treshold = int(temp)
+				devices[i].temp_trigger = int(crossings)
+				devices[i].save(update_fields=['temp_trigger','temp_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.temp_treshold = int(temp)
+			device.temp_trigger = int(crossings)
+			device.save(update_fields=['temp_trigger','temp_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(10,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/temp_settings.html',content)
+
+@login_required
+def change_humd_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(1,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/humd_settings.html',content)
+
+@login_required
+def humd_settings(request):
+	success = False
+	if request.method == 'POST':
+		humd = request.POST.get('humd')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].humd_treshold = int(humd)
+				devices[i].humd_trigger = int(crossings)
+				devices[i].save(update_fields=['humd_trigger','humd_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.humd_treshold = int(humd)
+			device.humd_trigger = int(crossings)
+			device.save(update_fields=['humd_trigger','humd_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(1,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/humd_settings.html',content)
+
+@login_required
+def change_light_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(0,10),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/light_settings.html',content)
+
+@login_required
+def light_settings(request):
+	success = False
+	if request.method == 'POST':
+		light = request.POST.get('light')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].light_treshold = int(light)
+				devices[i].light_trigger = int(crossings)
+				devices[i].save(update_fields=['light_trigger','light_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.light_treshold = int(light)
+			device.light_trigger = int(crossings)
+			device.save(update_fields=['light_trigger','light_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(0,10),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/light_settings.html',content)

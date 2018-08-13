@@ -28,7 +28,7 @@ class Device(models.Model):
 
     light_warnings = models.IntegerField(default=0)
     light_treshold = models.IntegerField(default=10000) #disabled with stardard settings
-    humd_trigger = models.IntegerField(default=2)
+    light_trigger = models.IntegerField(default=2)
 
 
 

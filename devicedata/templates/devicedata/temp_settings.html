@@ -17,15 +17,15 @@
 
 
 <nav class="nav nav-pills">
-  <a class="nav-item nav-link active" href="{% url 'change_alarm_settings' %}">Dust</a>
-  <a class="nav-item nav-link" href="{% url 'change_temp_settings' %}">Temp</a>
+  <a class="nav-item nav-link" href="{% url 'change_alarm_settings' %}">Dust</a>
+  <a class="nav-item nav-link active" href="{% url 'change_temp_settings' %}">Temp</a>
   <a class="nav-item nav-link" href="{% url 'change_humd_settings' %}">Humd</a>
   <a class="nav-item nav-link" href="{% url 'change_light_settings' %}">Light</a>
 </nav>
 <br/>
 <br/>
 
-<form action="{% url 'update_settings' %}" method="POST">
+<form action="{% url 'temp_settings' %}" method="POST">
   {% csrf_token %}
   
   <div class="form-group">
@@ -42,14 +42,14 @@
   
   <div class="form-group">
     <br/>
-    <h5>Dust alarm threshold</h5>
+    <h5>Temperature alarm threshold</h5>
     <p>Set the value which will trigger alarms, alarm emails also are send based on this value</p>
     <!--<label for="exampleFormControlSelect1">Dust alarm value</label>-->
-    <select class="form-control" id="exampleFormControlSelect1" name="dust">
-      <option value="51">Standard (51 pcs./0.5 dl)</option>
+    <select class="form-control" id="exampleFormControlSelect1" name="temp">
+      <option value="26">Standard (26 &#8451;)</option>
       <option value="10000">No alarms</option> <!-- just use a big value which should'n ever be send-->
       {% for i in options %}
-        <option value="{{i}}">{{i}} pcs./0.5 dl</option>
+        <option value="{{i}}">{{i}} &#8451;</option>
       {% endfor %}
     </select>
   </div>

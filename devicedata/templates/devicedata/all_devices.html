@@ -41,7 +41,7 @@
 	  	</ul>
 
 	  		<table id="device_table" class="display" cellspacing="0" width="100%">
-	  		{% if data.temperature < 26 and data.humidity < 51 and data.dust < 25 %}
+	  		{% if data.temperature < data.device.temp_treshold and data.humidity < data.device.humd_treshold and data.dust < data.device.dust_set_point and data.light < data.device.light_treshold %}
 		  		<tbody>
 		  			{% if data.device.user_notes != None %}
 		  				<tr class="table-success">
@@ -73,6 +73,11 @@
 			  			<td> <font color="green">{{data.humidity}} &percnt; </font></td>
 			  			
 		  			</tr>
+		  			<tr class="table-success">
+			  			<td> <b>Light </b></td>
+			  			<td> <font color="green">{{data.light}} </font></td>
+			  			
+		  			</tr>
 		  			
 		  		</tbody>
 
@@ -95,7 +100,7 @@
 			  		
 			  		<tr class="table-danger">
 			  			<td> <b>Temperature </b></td>
-			  			{% if data.temperature > 25 %}
+			  			{% if data.temperature >= data.device.temp_treshold %}
 			  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
 			  			{% else %}
 			  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
@@ -103,18 +108,26 @@
 			  		</tr>
 			  		<tr class="table-danger">
 			  			<td> <b>Dust </b></td>
-			  			{% if data.dust > 24 %}
-			  				<td><font color="red">{{data.dust}} pcs &sol; ml </font></td>
+			  			{% if data.dust > data.device.dust_set_point %}
+			  				<td><font color="red">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
 			  			{% else %}
-			  				<td><font color="green">{{data.dust}} pcs &sol; ml </font></td>
+			  				<td><font color="green">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
 			  			{% endif %}
 			  		</tr>
 			  		<tr class="table-danger">
 			  			<td> <b>Humidity </b></td>
-			  			{% if data.humidity > 50 %}
+			  			{% if data.humidity > data.device.humd_treshold %}
 			  				<td><font color="red">{{data.humidity}} &percnt; </font></td>
 			  			{% else %}
 			  				<td><font color="green">{{data.humidity}} &percnt; </font></td>
+			  			{% endif %}		  			
+		  			</tr>
+		  			<tr class="table-danger">
+			  			<td> <b>Light </b></td>
+			  			{% if data.light > data.device.light_treshold %}
+			  				<td><font color="red">{{data.light}}</font></td>
+			  			{% else %}
+			  				<td><font color="green">{{data.light}}</font></td>
 			  			{% endif %}		  			
 		  			</tr>
 

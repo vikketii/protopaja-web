@@ -25,6 +25,12 @@ urlpatterns = [
     path('remove_emails/', views.remove_emails, name='remove_emails'),
     path('remove_email/', views.remove_email, name='remove_email'),
     path('show_alarm/', views.show_alarm, name='show_alarm'),
-    path('change_alarm_settings', views.change_alarm_settings, name='change_alarm_settings'),
-    path('update_settings/', views.update_settings, name='update_settings')
+    path('change_alarm_settings/', views.change_alarm_settings, name='change_alarm_settings'),
+    path('update_settings/', views.update_settings, name='update_settings'),
+    path('change_temp_settings/', views.change_temp_settings, name='change_temp_settings'),
+    path('temp_settings/', views.temp_settings, name='temp_settings'),
+    path('change_humd_settings/', views.change_humd_settings, name='change_humd_settings'),
+    path('humd_settings/', views.humd_settings, name='humd_settings'),
+    path('change_light_settings/', views.change_light_settings, name='change_light_settings'),
+    path('light_settings/', views.light_settings, name='light_settings')
 ]
