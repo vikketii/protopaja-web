@@ -333,7 +333,7 @@ def send_string(request):
                 # use celery to do async heavy work -> makes page more responsive
                 # check tasks.py
             
-                warning_emails.delay(device.info,int(device_id), int(dust),time)
+                warning_emails.delay(device.info,int(device_id), int(dust),time, int(temp), int(humd), int(light))
                 return HttpResponse(data_object)
 
     # incorrect username/password

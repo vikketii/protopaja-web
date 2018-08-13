@@ -18,6 +18,21 @@ class Device(models.Model):
     # this is user defined value that tells how many warnings lead to a warning email and alarm
     dust_trigger = models.IntegerField(default=2)
 
+    temp_warnings = models.IntegerField(default=0)
+    temp_treshold = models.IntegerField(default=26)
+    temp_trigger = models.IntegerField(default=2)
+
+    humd_warnings = models.IntegerField(default=0)
+    humd_treshold = models.IntegerField(default=60)
+    humd_trigger = models.IntegerField(default=2)
+
+    light_warnings = models.IntegerField(default=0)
+    light_treshold = models.IntegerField(default=10000) #disabled with stardard settings
+    humd_trigger = models.IntegerField(default=2)
+
+
+
+
     def __str__(self):
         return 'Device: {0}' .format(self.info)
 
@@ -76,3 +91,4 @@ class Alarm(models.Model):
     time_ack = models.DateTimeField(null=True) #time when alarm was inactivated
     active = models.BooleanField(default = True) #tells whether alarms is active or not
     device_id = models.IntegerField(null=True) #link to device
+    alarm= models.CharField(null=True, max_length=20) #dust, temp, humd, light
