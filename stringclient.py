@@ -16,9 +16,9 @@ n = 1
 
 
 while True:
-    dust = random.randint(10,50)
-    temperature = random.randint(20, 28)
-    humidity = random.randint(30, 70)
+    dust = random.randint(40,90)
+    temperature = random.randint(20, 40)
+    humidity = random.randint(50, 70)
     light = random.randint(0,9)
     device_id = str(random.randint(1,3))
     #device_id = '2'

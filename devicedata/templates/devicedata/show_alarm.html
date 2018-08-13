@@ -1,0 +1,32 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+	<h4> <b><font color="red">Alarm </font></b></h4>
+	<ul>
+		<br/>
+		<li><b>{{info}}</b></li>
+		<br/>
+		<li>ID: {{alarm.id}}</li>
+		<br/>
+		<li>Started: {{alarm.time}}</li>
+		<br/>
+		{% if alarm.time_over %}
+			<li>Situation normalized: {{alarm.time_over}}</li>
+			<br/>
+			<li>For possible extra information, check out database entries</li>
+			<br/>
+			<a href="{% url 'remove_alarms' %}?alarm_id={{alarm.id}}"> Inactivate alarm</a>
+		{% else %}
+			<li><b><font color="red">Alarm still on, immediate action needed!</font></b></li>
+			<br/>
+			<li>For possible extra information, check out database entries</li>
+			<br/>
+			<a href="{% url 'remove_alarms' %}?alarm_id={{alarm.id}}"> Inactivate alarm (not recommended)</a>
+		{% endif %}
+
+		
+
+		
+
+	</ul>
+{% endblock content %}

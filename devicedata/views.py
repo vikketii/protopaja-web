@@ -4,12 +4,13 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.urls import reverse
 from django.views import generic
 
-from .models import Data, Device
+from .models import Data, Device, Email, Alarm
 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 import datetime
 from django.shortcuts import redirect
+from .tasks import *
 """
 class IndexView(generic.ListView):
     template_name = 'devicedata/index.html'
@@ -182,32 +183,37 @@ def all_devices (request):
 def modify_devices(request):
     if request.method == 'GET':
         device_id = request.GET.get('device_id')
-        
-        devices = Device.objects.select_related().filter(id = device_id)
-        
-        data = Data.objects.select_related().filter(device = devices[0])
+        if device_id:
+            devices = Device.objects.select_related().filter(id = device_id)
+            
+            data = Data.objects.select_related().filter(device = devices[0])
 
-        if devices[0].preference:
-        	#user has defined amount of datapoints
-        	latest_data = data.order_by('-collection_date')[:devices[0].datapoints]
-        	num = devices[0].datapoints
+            if devices[0].preference:
+            	#user has defined amount of datapoints
+            	latest_data = data.order_by('-collection_date')[:devices[0].datapoints]
+            	num = devices[0].datapoints
+            else:
+            	#use standard amount
+    	        global val
+    	        latest_data = data.order_by('-collection_date')[:val]
+    	        # remember to update datapoints to standard set point if there is no preference
+    	        devices[0].datapoints = val
+    	        devices[0].save(update_fields=['datapoints'])
+    	        num = val
+            
+            #devices = Device.objects.all()
+            context = {
+            'device' : devices[0],
+            'latest_data_list' : latest_data,
+            'id' : device_id,
+            'num' : num
+            }
+            return render(request, 'devicedata/modify_devices.html', context)
+
         else:
-        	#use standard amount
-	        global val
-	        latest_data = data.order_by('-collection_date')[:val]
-	        # remember to update datapoints to standard set point if there is no preference
-	        devices[0].datapoints = val
-	        devices[0].save(update_fields=['datapoints'])
-	        num = val
-        
-        #devices = Device.objects.all()
-        context = {
-        'device' : devices[0],
-        'latest_data_list' : latest_data,
-        'id' : device_id,
-        'num' : num
-        }
-        return render(request, 'devicedata/modify_devices.html', context)
+            return redirect('all_devices')
+
+
 
 @login_required
 def new_device_content(request):
@@ -318,10 +324,16 @@ def send_string(request):
 
             finally:
                 # create a new data object for the correct device
-                time = datetime.datetime.now()
+                time = datetime.datetime.now() + datetime.timedelta(hours=3)
                 data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
                 global data
                 data += 1
+
+                # asyncronously update Devices warnings and check if warning emails need to be send, send those if needed
+                # use celery to do async heavy work -> makes page more responsive
+                # check tasks.py
+            
+                warning_emails.delay(device.info,int(device_id), int(dust),time, int(temp), int(humd), int(light))
                 return HttpResponse(data_object)
 
     # incorrect username/password
@@ -389,3 +401,346 @@ def update_select(request):
 	else:
 		# if user reloaded the page, redirect to all devices
 		 return redirect('all_devices')
+
+@login_required
+def add_emails(request):
+	email_objects = Email.objects.all()
+	devices = Device.objects.all()
+	content = {
+		'email_list' : email_objects,
+		'devices' : devices,
+        'info' : ''
+	}
+	return render(request,'devicedata/add_emails.html',content)
+
+@login_required
+def add_email(request):
+    if request.method == 'POST':
+        device = request.POST.get('select_device')
+        email_addr = request.POST.get('email_addr')
+        devices = Device.objects.all()
+        email_objects = Email.objects.all()
+        info = ''
+
+
+        if email_addr:
+			# check it's not None
+            email = Email.objects.select_related().filter(address=email_addr)
+
+            if (email):
+				#destroy the old and create a new
+                email[0].delete()
+
+            if devices:
+                if  len(email_objects) < 5:
+                    # this is used to restrict emails to 5
+                    email = Email.objects.create(address=email_addr)
+
+                    if device == 'All':
+                        # add all devices
+                        for i in range(0,len(devices)):
+                            email.devices.add(devices[i])
+
+                        email.device_name = 'All'
+
+                    else:
+                        email.devices.add(devices.get(id=int(device)))
+                        email.device_name = devices.get(id=int(device)).info
+                        
+                    email.save(update_fields=['device_name'])
+                    info = 'Added a new email!'
+    				
+                else:
+                    info = 'Already 5 emails'
+
+        email_objects = Email.objects.all()
+        content = {
+            'email_list' : email_objects,
+            'devices' : devices,
+            'info' : info
+        }
+        return render(request,'devicedata/add_emails.html',content)
+
+    # redirect get methods
+
+    return redirect('warnings')
+
+
+
+@login_required
+def warnings(request):
+    alarms = Alarm.objects.select_related().filter(active=True)
+    if alarms:
+        alarms_sorted = alarms.order_by('-time')
+
+        content = {
+            'alarms' : alarms_sorted
+        }
+    else:
+         content = {
+            'alarms' : None
+        }
+
+    return render(request, 'devicedata/warnings.html', content)
+
+@login_required
+def update_warnings(request):
+    alarms = Alarm.objects.select_related().filter(active=True)
+    if alarms:
+        alarms_sorted = alarms.order_by('-time')
+
+        content = {
+            'alarms' : alarms_sorted
+        }
+    else:
+         content = {
+            'alarms' : None
+        }
+
+    return render(request, 'devicedata/update_warnings.html', content)
+
+@login_required
+def remove_alarms(request):
+    
+	try:
+		if request.method == 'POST':
+			alarm_id = request.POST.get('alarm_id')
+		else:
+			alarm_id = request.GET.get('alarm_id')
+
+		alarm = Alarm.objects.get(id=alarm_id)
+		# user acknowledged alarm, inactivate the alarm
+		alarm.time_ack = datetime.datetime.now() + datetime.timedelta(hours=3)
+		alarm.active = False
+		alarm.save(update_fields=['time_ack','active'])
+
+		alarms = Alarm.objects.select_related().filter(active=True)
+		if alarms:
+			alarms_sorted = alarms.order_by('-time')
+			content = {
+                'alarms' : alarms_sorted
+            }
+		else:
+			content = {
+                'alarms' : None
+            }
+		return render(request, 'devicedata/warnings.html', content)
+		
+        
+
+
+	except Alarm.DoesNotExist:
+		#user reloaded old page
+		return redirect('warnings')
+
+	
+@login_required
+def remove_emails(request):
+    emails = Email.objects.all()
+    content = {
+    	'emails' : emails
+    }
+    return render(request,'devicedata/remove_emails.html',content)
+
+@login_required
+def remove_email(request):
+	if request.method == 'POST':
+		# this will fail if email_address is not right
+		try:
+			email_address = request.POST.get('email_address')
+			print(email_address)
+			email = Email.objects.get(address=email_address)
+			# delete the email
+			email.delete()
+
+		except Email.DoesNotExist:
+			# user reloaded old page
+			pass
+
+		finally:
+
+			# rerender the page
+			emails = Email.objects.all()
+			content = {
+	    		'emails' : emails
+			}
+			return render(request,'devicedata/remove_emails.html',content)
+
+	# was get request, redirect
+	return redirect('remove_emails')
+
+@login_required
+def show_alarm(request):
+	try:
+		alarm_id = request.GET.get('alarm_id')
+		alarm = Alarm.objects.get(id=alarm_id)
+		content = {
+			'alarm' : alarm,
+			'info' : alarm.alarm_type
+		}
+		return render(request,'devicedata/show_alarm.html',content)
+
+	except Alarm.DoesNotExist:
+		# user reloaded page or did smt unexpected, redirect
+		return redirect('warnings')
+
+		
+@login_required
+def change_alarm_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(20,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/change_alarm_settings.html',content)
+
+@login_required
+def update_settings(request):
+	success = False
+	if request.method == 'POST':
+		dust = request.POST.get('dust')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].dust_set_point = int(dust)
+				devices[i].dust_trigger = int(crossings)
+				devices[i].save(update_fields=['dust_trigger','dust_set_point'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.dust_set_point = int(dust)
+			device.dust_trigger = int(crossings)
+			device.save(update_fields=['dust_trigger','dust_set_point'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(20,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/change_alarm_settings.html',content)
+
+@login_required
+def change_temp_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(10,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/temp_settings.html',content)
+
+@login_required
+def temp_settings(request):
+	success = False
+	if request.method == 'POST':
+		temp = request.POST.get('temp')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].temp_treshold = int(temp)
+				devices[i].temp_trigger = int(crossings)
+				devices[i].save(update_fields=['temp_trigger','temp_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.temp_treshold = int(temp)
+			device.temp_trigger = int(crossings)
+			device.save(update_fields=['temp_trigger','temp_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(10,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/temp_settings.html',content)
+
+@login_required
+def change_humd_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(1,100),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/humd_settings.html',content)
+
+@login_required
+def humd_settings(request):
+	success = False
+	if request.method == 'POST':
+		humd = request.POST.get('humd')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].humd_treshold = int(humd)
+				devices[i].humd_trigger = int(crossings)
+				devices[i].save(update_fields=['humd_trigger','humd_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.humd_treshold = int(humd)
+			device.humd_trigger = int(crossings)
+			device.save(update_fields=['humd_trigger','humd_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(1,100),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/humd_settings.html',content)
+
+@login_required
+def change_light_settings(request):
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(0,10),
+	 'devices' : devices,
+	 'success' : False
+	}
+	return render(request,'devicedata/light_settings.html',content)
+
+@login_required
+def light_settings(request):
+	success = False
+	if request.method == 'POST':
+		light = request.POST.get('light')
+		crossings = request.POST.get('crossings')
+		device_id = request.POST.get('device_id')
+		
+		if device_id == 'All':
+			devices = Device.objects.all()
+			for i in range(0,len(devices)):
+				#update all devices
+				devices[i].light_treshold = int(light)
+				devices[i].light_trigger = int(crossings)
+				devices[i].save(update_fields=['light_trigger','light_treshold'])
+		else:
+			device = Device.objects.get(id=device_id)
+			device.light_treshold = int(light)
+			device.light_trigger = int(crossings)
+			device.save(update_fields=['light_trigger','light_treshold'])
+		success = True
+		
+	devices = Device.objects.all()
+	content = {
+	 'options' : range(0,10),
+	 'devices' : devices,
+	 'success' : success
+	}
+	return render(request,'devicedata/light_settings.html',content)

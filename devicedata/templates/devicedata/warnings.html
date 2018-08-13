@@ -1,0 +1,90 @@
+{% extends 'base_generic.html' %}
+
+{% block nav-bar %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'index' %}">Home</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'charts' %}">Charts</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'all_devices' %}">Devices</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'data_table' %}">Incoming Data</a>
+</li>
+<li class="nav-item active">
+    <a class="nav-link" href="{% url 'warnings' %}">Alarms</a>
+</li>
+{% endblock nav-bar %}
+
+{% block content %}
+
+<!-- check out https://getbootstrap.com/docs/4.0/components/ -->
+
+
+<div class="dropdown show">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   	Configure alarms
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <a class="dropdown-item" href="{% url 'add_emails' %}">Add emails</a>
+    <a class="dropdown-item" href="{% url 'remove_emails' %}">Delete emails</a>
+    <a class="dropdown-item" href="{% url 'change_alarm_settings' %}">Modify alarm settings</a>
+    
+  </div>
+</div>
+
+<div id="alarm_div">
+  <h2 align='center'><b><font color='red'>Current alarms</font></b></h2>
+  <ul class="list-group">
+
+
+  <li class="list-group-item"> </li>
+  {% if alarms %}
+    
+      {% for alarm in alarms %}
+        <form action="{% url 'remove_alarms' %}" method="POST">
+          {% csrf_token %} 
+          <li class="list-group-item list-group-item-danger">
+            <a href="{% url 'show_alarm' %}?alarm_id={{alarm.id}}"><font color='red'>{{ alarm.time}}&emsp;&emsp;{{alarm.alarm_type }}</font></a>
+            <input class="btn btn-danger" style="float: right;" type="submit" value="Inactivate alarm">
+            <input class="btn btn-danger" type="hidden" value="{{alarm.id}}" name="alarm_id">
+          </li> 
+        </form>
+      
+      {% endfor %}
+  {% else %}
+     <li class="list-group-item list-group-item-success">No alarms at the moment</li>
+  {% endif %}
+  
+
+  
+  </ul>
+</div>
+
+{% endblock content %}
+
+<script>
+  {% block script %}
+    // This ajax script updates div containing alarms
+        setInterval(function() {
+            
+            $.ajax({
+                type: "GET",
+                url: {% url 'update_warnings' %},  // URL to the view that updates the div
+            data : {}
+                                
+            })
+            .done(function(response) {
+                $('#alarm_div').html(response);
+            
+            });
+
+            
+        }, 1000)
+
+
+    {% endblock %}
+</script>

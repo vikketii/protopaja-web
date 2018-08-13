@@ -1,0 +1,75 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+<!-- check out https://getbootstrap.com/docs/4.0/components/forms/ -->
+<h2 align="center">Alarm settings</h2>
+
+<br/>
+{% if success %}
+  <h5>Settings successfully modified</h5>
+{% endif %}
+<br/>
+<h4><b>Caution</b></h4>
+<p> Modifying settings will affect to whole alarm system including all alarm emails</p>
+<br/>
+
+
+
+
+<nav class="nav nav-pills">
+  <a class="nav-item nav-link active" href="{% url 'change_alarm_settings' %}">Dust</a>
+  <a class="nav-item nav-link" href="{% url 'change_temp_settings' %}">Temp</a>
+  <a class="nav-item nav-link" href="{% url 'change_humd_settings' %}">Humd</a>
+  <a class="nav-item nav-link" href="{% url 'change_light_settings' %}">Light</a>
+</nav>
+<br/>
+<br/>
+
+<form action="{% url 'update_settings' %}" method="POST">
+  {% csrf_token %}
+  
+  <div class="form-group">
+    <h5>Devices</h5>
+    <p>All the devices your modification affects</p>
+    <!--<label for="exampleFormControlSelect1">Devices</label>-->
+    <select class="form-control" id="exampleFormControlSelect1" name="device_id">
+      <option value="All">All</option>
+      {% for device in devices %}
+        <option value={{device.id}}>{{device.info}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <br/>
+    <h5>Dust alarm threshold</h5>
+    <p>Set the value which will trigger alarms, alarm emails also are send based on this value</p>
+    <!--<label for="exampleFormControlSelect1">Dust alarm value</label>-->
+    <select class="form-control" id="exampleFormControlSelect1" name="dust">
+      <option value="51">Standard (51 pcs./0.5 dl)</option>
+      <option value="10000">No alarms</option> <!-- just use a big value which should'n ever be send-->
+      {% for i in options %}
+        <option value="{{i}}">{{i}} pcs./0.5 dl</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <br/>
+    <h5>Amount of crossings allowed</h5>
+    <p>Set how many times dust measurement can exceed alarm value without alarm being triggered</p>
+    <!--<label for="exampleFormControlSelect1">Amount of crossings allowed</label>-->
+    <select class="form-control" id="exampleFormControlSelect1" name="crossings">
+      <option value="2">Standard (1)</option>
+      <option value="1">0</option>
+      <option value="2">1</option>
+      <option value="3">2</option>
+      <option value="4">3</option>
+      <option value="5">4</option>
+    </select>
+  </div>
+  <br/>
+  <input type="submit" value="Submit">
+  
+</form>
+
+{% endblock content %}
