@@ -9,10 +9,24 @@
 <br/>
 <br/>
 {% ifnotequal info "Already 5 emails" %}
-  <h6> <b><font color="blue">{{info}}</font></b> </h6>
+  <!--<h6> <b><font color="blue">{{info}}</font></b> </h6>-->
+  {% ifnotequal info "" %}
+    <div class="alert alert-success">
+    <strong>{{info}}</strong> 
+    </div>
+  {% endifnotequal %}
 {% else %}
-  <h6><a href="{% url 'remove_emails' %}"><b><font color="blue">{{info}}, remove an email before adding a new one!</font></b></a></h6>
+<div class="alert alert-danger">
+  <strong><a href="{% url 'remove_emails' %}"><font color="red">{{info}}, remove an email before adding a new one!</font></a></strong> 
+</div>
 {% endifnotequal %}
+<br/>
+
+<nav class="nav nav-pills">
+  <a class="nav-item nav-link active" href="{% url 'add_emails' %}">Add emails</a>
+  <a class="nav-item nav-link" href="{% url 'remove_emails' %}">Remove emails</a>
+</nav>
+<br/>
 <br/>
 <h4>Already added emails</h4>
 <br/>

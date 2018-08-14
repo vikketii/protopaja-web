@@ -7,7 +7,7 @@ from django.core.mail import EmailMessage
 from .models import Device, Data, Email, Alarm
 
 @shared_task
-def send_warning_mail(user,cause, info):
+def send_warning_mail(user,cause):
 	subject = ' Warning from Consair sensor system'
 	body = 'This message was sent because ' + cause + '\n' + 'exceeded set treshold(s).\n' + 'Instant action recommended!'
 	
