@@ -44,9 +44,7 @@ def charts(request):
 @login_required
 def data_table(request):
 
-    # This returns 5 most latest data objects to the table
-    # old -> new
-    num = 5
+    # This returns the latest data object to the table
     obs = Data.objects.all()
     val = obs.count()
     data_object = Data.objects.none()
@@ -602,6 +600,7 @@ def update_settings(request):
 		dust = request.POST.get('dust')
 		crossings = request.POST.get('crossings')
 		device_id = request.POST.get('device_id')
+		warning_treshold = request.POST.get('warning_treshold')
 		
 		if device_id == 'All':
 			devices = Device.objects.all()
@@ -609,12 +608,14 @@ def update_settings(request):
 				#update all devices
 				devices[i].dust_set_point = int(dust)
 				devices[i].dust_trigger = int(crossings)
-				devices[i].save(update_fields=['dust_trigger','dust_set_point'])
+				devices[i].dust_warning = int(warning_treshold)
+				devices[i].save(update_fields=['dust_trigger','dust_set_point','dust_warning'])
 		else:
 			device = Device.objects.get(id=device_id)
 			device.dust_set_point = int(dust)
 			device.dust_trigger = int(crossings)
-			device.save(update_fields=['dust_trigger','dust_set_point'])
+			device.dust_warning = int(warning_treshold)
+			device.save(update_fields=['dust_trigger','dust_set_point','dust_warning'])
 		success = True
 		
 	devices = Device.objects.all()
@@ -642,6 +643,7 @@ def temp_settings(request):
 		temp = request.POST.get('temp')
 		crossings = request.POST.get('crossings')
 		device_id = request.POST.get('device_id')
+		warning_treshold = request.POST.get('warning_treshold')
 		
 		if device_id == 'All':
 			devices = Device.objects.all()
@@ -649,12 +651,14 @@ def temp_settings(request):
 				#update all devices
 				devices[i].temp_treshold = int(temp)
 				devices[i].temp_trigger = int(crossings)
-				devices[i].save(update_fields=['temp_trigger','temp_treshold'])
+				devices[i].temp_warning = int(warning_treshold)
+				devices[i].save(update_fields=['temp_trigger','temp_treshold','temp_warning'])
 		else:
 			device = Device.objects.get(id=device_id)
 			device.temp_treshold = int(temp)
 			device.temp_trigger = int(crossings)
-			device.save(update_fields=['temp_trigger','temp_treshold'])
+			device.temp_warning = int(warning_treshold)
+			device.save(update_fields=['temp_trigger','temp_treshold','temp_warning'])
 		success = True
 		
 	devices = Device.objects.all()
@@ -682,6 +686,7 @@ def humd_settings(request):
 		humd = request.POST.get('humd')
 		crossings = request.POST.get('crossings')
 		device_id = request.POST.get('device_id')
+		warning_treshold = request.POST.get('warning_treshold')
 		
 		if device_id == 'All':
 			devices = Device.objects.all()
@@ -689,12 +694,14 @@ def humd_settings(request):
 				#update all devices
 				devices[i].humd_treshold = int(humd)
 				devices[i].humd_trigger = int(crossings)
-				devices[i].save(update_fields=['humd_trigger','humd_treshold'])
+				devices[i].humd_warning = int(warning_treshold)
+				devices[i].save(update_fields=['humd_trigger','humd_treshold','humd_warning'])
 		else:
 			device = Device.objects.get(id=device_id)
 			device.humd_treshold = int(humd)
 			device.humd_trigger = int(crossings)
-			device.save(update_fields=['humd_trigger','humd_treshold'])
+			device.humd_warning = int(warning_treshold)
+			device.save(update_fields=['humd_trigger','humd_treshold','humd_warning'])
 		success = True
 		
 	devices = Device.objects.all()
@@ -722,6 +729,7 @@ def light_settings(request):
 		light = request.POST.get('light')
 		crossings = request.POST.get('crossings')
 		device_id = request.POST.get('device_id')
+		warning_treshold = request.POST.get('warning_treshold')
 		
 		if device_id == 'All':
 			devices = Device.objects.all()
@@ -729,12 +737,14 @@ def light_settings(request):
 				#update all devices
 				devices[i].light_treshold = int(light)
 				devices[i].light_trigger = int(crossings)
-				devices[i].save(update_fields=['light_trigger','light_treshold'])
+				devices[i].light_warning = int(warning_treshold)
+				devices[i].save(update_fields=['light_trigger','light_treshold','light_warning'])
 		else:
 			device = Device.objects.get(id=device_id)
 			device.light_treshold = int(light)
 			device.light_trigger = int(crossings)
-			device.save(update_fields=['light_trigger','light_treshold'])
+			device.light_warning = int(warning_treshold)
+			device.save(update_fields=['light_trigger','light_treshold','light_warning'])
 		success = True
 		
 	devices = Device.objects.all()

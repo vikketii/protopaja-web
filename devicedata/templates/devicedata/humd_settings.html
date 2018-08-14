@@ -6,7 +6,9 @@
 
 <br/>
 {% if success %}
-  <h5>Settings successfully modified</h5>
+  <div class="alert alert-success">
+  <strong>Humidity settings modified successfully!</strong> 
+  </div>
 {% endif %}
 <br/>
 <h4><b>Caution</b></h4>
@@ -36,6 +38,18 @@
       <option value="All">All</option>
       {% for device in devices %}
         <option value={{device.id}}>{{device.info}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="form-group">
+    <br/>
+    <h5>Humidity warning threshold</h5>
+    <p>Set the value, which will trigger warnings. The value must be smaller than alarm treshold, otherwise no warnings are shown</p>
+    <select class="form-control" id="exampleFormControlSelect1" name="warning_treshold">
+      <option value="55">Standard (55 &#37;)</option>
+      <option value="10000">No warnings</option> <!-- just use a big value which should'n ever be send-->
+      {% for i in options %}
+        <option value="{{i}}">{{i}} &#37;</option>
       {% endfor %}
     </select>
   </div>

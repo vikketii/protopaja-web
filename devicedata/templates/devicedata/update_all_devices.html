@@ -7,97 +7,166 @@
 	  	</ul>
 
 	  		<table id="device_table" class="display" cellspacing="0" width="100%">
-	  		{% if data.temperature < data.device.temp_treshold and data.humidity < data.device.humd_treshold and data.dust < data.device.dust_set_point and data.light < data.device.light_treshold %}
-		  		<tbody>
 
-		  			{% if data.device.user_notes != None %}
-		  				<tr class="table-success">
-		  					<td> <b>Description</b></td>
-			  				<td>{{data.device.user_notes}}</td>
+	  			{% if data.temperature < data.device.temp_treshold and data.humidity < data.device.humd_treshold and data.dust < data.device.dust_set_point and data.light < data.device.light_treshold %}
+
+  					{% if data.temperature < data.device.temp_warning and data.humidity < data.device.humd_warning and data.dust < data.device.dust_warning and data.light < data.device.light_warning %}
+		  				<tbody>
+				  			{% if data.device.user_notes != None %}
+				  				<tr class="table-success">
+				  					<td> <b>Description</b></td>
+					  				<td>{{data.device.user_notes}}</td>
+					  			</tr>
+					  		{% endif %}
+
+					  		<tr class="table-success">
+
+					  			
+					  			<td> <b>Collection time </b></td>
+					  			<td>{{data.collection_date}}</td>
+					  			
+					  		</tr>
+					  		<tr class="table-success">
+					  			<td> <b> Temperature </b></td>
+					  			<td><font color="green">{{data.temperature}}  &#8451 </font></td>
+					  			
+					  		</tr>
+					  		<tr class="table-success">
+					  			<td> <b> Dust particles</b></td>
+					  			<td><font color="green">{{data.dust}}  pcs. &sol; 0.5 dl</font></td>
+					  			
+					  		</tr>
+
+					  		<tr class="table-success">
+					  			<td> <b>Humidity </b></td>
+					  			<td> <font color="green">{{data.humidity}} &percnt; </font></td>
+					  			
+				  			</tr>
+				  			<tr class="table-success">
+					  			<td> <b>Light </b></td>
+					  			<td> <font color="green">{{data.light}} </font></td>
+					  			
+				  			</tr>
+				  			
+				  		</tbody>
+
+			  		{% else %}
+			  			<!-- No alarms but some warnings -->
+	  		
+				  		<tbody>
+
+			  				{% if data.device.user_notes != None %}
+			  					<tr class="table-warning">
+				  					<td> <b>Description</b></td>
+					  				<td>{{data.device.user_notes}}</td>
+					  			</tr>
+					  		{% endif %}
+
+					  		<tr class="table-warning">
+					  			
+					  			<td> <b>Collection time </b></td>
+					  			<td>{{data.collection_date}}</td>
+					  			
+					  		</tr>
+					  		
+					  		<tr class="table-warning">
+					  			<td> <b>Temperature </b></td>
+					  			{% if data.temperature >= data.device.temp_warning %}
+					  				<td><font color="#FF7700">{{data.temperature}} &#8451 </font></td>
+					  			{% else %}
+					  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+					  			{% endif %}
+					  		</tr>
+					  		<tr class="table-warning">
+					  			<td> <b>Dust </b></td>
+					  			{% if data.dust >= data.device.dust_warning %}
+					  				<td><font color="#FF7700">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
+					  			{% else %}
+					  				<td><font color="green">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
+					  			{% endif %}
+					  		</tr>
+					  		<tr class="table-warning">
+					  			<td> <b>Humidity </b></td>
+					  			{% if data.humidity >= data.device.humd_warning %}
+					  				<td><font color="#FF7700">{{data.humidity}} &percnt; </font></td>
+					  			{% else %}
+					  				<td><font color="green">{{data.humidity}} &percnt; </font></td>
+					  			{% endif %}		  			
+				  			</tr>
+				  			<tr class="table-warning">
+					  			<td> <b>Light </b></td>
+					  			{% if data.light >= data.device.light_warning %}
+					  				<td><font color="#FF7700">{{data.light}}</font></td>
+					  			{% else %}
+					  				<td><font color="green">{{data.light}}</font></td>
+					  			{% endif %}		  			
+				  			</tr>
+
+			  			</tbody>
+
+		  			{% endif %}
+
+		  		{% else %}
+		  			<tbody>
+
+		  				{% if data.device.user_notes != None %}
+		  					<tr class="table-danger">
+			  					<td> <b>Description</b></td>
+				  				<td>{{data.device.user_notes}}</td>
+				  			</tr>
+				  		{% endif %}
+
+				  		<tr class="table-danger">
+				  			
+				  			<td> <b>Collection time </b></td>
+				  			<td>{{data.collection_date}}</td>
+				  			
+				  		</tr>
+				  		
+				  		<tr class="table-danger">
+				  			<td> <b>Temperature </b></td>
+				  			{% if data.temperature >= data.device.temp_treshold %}
+				  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
+			  				{% elif data.temperature >= data.device.temp_warning %}
+			  					<td><font color="#FF7700">{{data.temperature}} &#8451 </font></td>
+				  			{% else %}
+				  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+				  			{% endif %}
+				  		</tr>
+				  		<tr class="table-danger">
+				  			<td> <b>Dust </b></td>
+				  			{% if data.dust >= data.device.dust_set_point %}
+				  				<td><font color="red">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
+
+			  				{% elif data.dust >= data.device.dust_warning %}
+			  					<td><font color="#FF7700">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
+				  			{% else %}
+				  				<td><font color="green">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
+				  			{% endif %}
+				  		</tr>
+				  		<tr class="table-danger">
+				  			<td> <b>Humidity </b></td>
+				  			{% if data.humidity >= data.device.humd_treshold %}
+				  				<td><font color="red">{{data.humidity}} &percnt; </font></td>
+			  				{% elif data.humidity >= data.device.humd_warning %}
+			  					<td><font color="#FF7700">{{data.humidity}} &percnt; </font></td>
+				  			{% else %}
+				  				<td><font color="green">{{data.humidity}} &percnt; </font></td>
+				  			{% endif %}		  			
 			  			</tr>
-			  		{% endif %}
-
-			  		<tr class="table-success">
-			  			
-			  			<td> <b>Collection time </b></td>
-			  			<td>{{data.collection_date}}</td>
-			  			
-			  		</tr>
-			  		<tr class="table-success">
-			  			<td> <b> Temperature </b></td>
-			  			<td><font color="green">{{data.temperature}}  &#8451 </font></td>
-			  			
-			  		</tr>
-			  		<tr class="table-success">
-			  			<td> <b> Dust particles</b></td>
-			  			<td><font color="green">{{data.dust}}  pcs &sol; ml </font></td>
-			  			
-			  		</tr>
-			  		<tr class="table-success">
-			  			<td> <b>Humidity </b></td>
-			  			<td> <font color="green">{{data.humidity}} &percnt;</font></td>
-			  			
-		  			</tr>
-		  			<tr class="table-success">
-			  			<td> <b>Light </b></td>
-			  			<td> <font color="green">{{data.light}} </font></td>
-			  			
-		  			</tr>
-		  			
-		  		</tbody>
-
-	  		{% else %}
-	  			<tbody>
-
-	  				{% if data.device.user_notes != None %}
-	  					<tr class="table-danger">
-		  					<td> <b>Description</b></td>
-			  				<td>{{data.device.user_notes}}</td>
+			  			<tr class="table-danger">
+				  			<td> <b>Light </b></td>
+				  			{% if data.light >= data.device.light_treshold %}
+				  				<td><font color="red">{{data.light}}</font></td>
+			  				{% elif data.light >= data.device.light_warning %}
+			  					<td><font color="#FF7700">{{data.light}}</font></td>
+				  			{% else %}
+				  				<td><font color="green">{{data.light}}</font></td>
+				  			{% endif %}		  			
 			  			</tr>
-			  		{% endif %}
 
-			  		<tr class="table-danger">
-			  			
-			  			<td> <b>Collection time </b></td>
-			  			<td>{{data.collection_date}}</td>
-			  			
-			  		</tr>
-			  		
-			  		<tr class="table-danger">
-			  			<td> <b>Temperature </b></td>
-			  			{% if data.temperature >= data.device.temp_treshold %}
-			  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
-			  			{% else %}
-			  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
-			  			{% endif %}
-			  		</tr>
-			  		<tr class="table-danger">
-			  			<td> <b>Dust </b></td>
-			  			{% if data.dust > data.device.dust_set_point %}
-			  				<td><font color="red">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
-			  			{% else %}
-			  				<td><font color="green">{{data.dust}} pcs. &sol; 0.5 dl </font></td>
-			  			{% endif %}
-			  		</tr>
-			  		<tr class="table-danger">
-			  			<td> <b>Humidity </b></td>
-			  			{% if data.humidity > data.device.humd_treshold %}
-			  				<td><font color="red">{{data.humidity}} &percnt; </font></td>
-			  			{% else %}
-			  				<td><font color="green">{{data.humidity}} &percnt; </font></td>
-			  			{% endif %}		  			
-		  			</tr>
-		  			<tr class="table-danger">
-			  			<td> <b>Light </b></td>
-			  			{% if data.light > data.device.light_treshold %}
-			  				<td><font color="red">{{data.light}}</font></td>
-			  			{% else %}
-			  				<td><font color="green">{{data.light}}</font></td>
-			  			{% endif %}		  			
-		  			</tr>
-
-		  		</tbody>
-	  		{% endif %}
+		  			</tbody>
+		  		{% endif %}
 	  	</table>
 	  		
-	  	{% endfor %}
+{% endfor %}
