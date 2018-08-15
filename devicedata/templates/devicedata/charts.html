@@ -21,9 +21,22 @@
 
 {% block content %}
 <h1>Charts</h1>
-<canvas id="temperature_chart" width="40" height="18"></canvas>
-<canvas id="humidity_chart" width="40" height="18"></canvas>
-
+<div class="row">
+    <div class="col-lg-6">
+        <canvas id="temperature_chart"></canvas>
+    </div>
+    <div class="col-lg-6">
+        <canvas id="humidity_chart"></canvas>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <canvas id="dust_chart"></canvas>
+    </div>
+    <div class="col-lg-6">
+        <canvas id="light_chart"></canvas>
+    </div>
+</div>
 {% endblock content %}
 
 
@@ -36,7 +49,8 @@ var time_data = []
 
 var temperature_data = []
 var humidity_data = []
-var pollution_data = []
+var dust_data = []
+var light_data = []
 
 var charts = []
 
@@ -94,18 +108,86 @@ function getChartDatas(data){
         time_data.push(data.data[i].date)
         temperature_data.push(data.data[i].temperature)
         humidity_data.push(data.data[i].humidity)
-        pollution_data.push(data.data[i].pollution)
+        dust_data.push(data.data[i].dust)
+        light_data.push(data.data[i].light)
     }
 }
-
 
 function setCharts(data){
     temperature_chart = setTempChart(data)
     humidity_chart = setHumidityChart(data)
+    dust_chart = setDustChart(data)
+    light_chart = setLightChart(data)
 
 
-    charts.push(humidity_chart, temperature_chart)
+    charts.push(humidity_chart, temperature_chart, dust_chart, light_chart)
 }
+
+
+function setTempChart(data){
+    var ctx = document.getElementById("temperature_chart");
+    var warningPointRadius = temperature_data.map((value) => value < 20 ? 0 : 4);
+    
+    var data = {
+        labels: time_data,
+        datasets: [{
+            name: 'temperature',
+            data: temperature_data,
+            //pointBorderColor: colours,
+            pointBackgroundColor: 'red',
+            fill: false,
+            lineTension: 0,
+            pointRadius: warningPointRadius,
+        }]
+    }
+
+    var options = {
+        legend: {
+            display: false,
+        },
+        title: {
+            display: true,
+            text: 'Temperature (Warning at 25 Celsius)',
+            fontSize: 16,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    suggestedMin: 10,
+                    suggestedMax: 30,
+                },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Degree Celsius'
+                },
+            }],
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 20,
+                    maxRotation: 20,
+                },
+                type: 'time',
+                time: {
+                    unit: 'minute',
+                    tooltipFormat: 'DD/MM/YY - HH:mm:ss',
+                    displayFormats: {
+                        'minute': 'DD/MM - HH:mm',
+                    }
+                }
+            }]
+        }
+    }
+
+    var temperature_chart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options,
+    })
+
+    return temperature_chart
+}
+
 
 function setHumidityChart(data){
     var ctx = document.getElementById("humidity_chart");
@@ -135,7 +217,7 @@ function setHumidityChart(data){
             yAxes: [{
                 ticks: {
                     suggestedMin: 0,
-                    max: 100,
+                    suggestedMax: 100,
                 },
                 scaleLabel: {
                     display: true,
@@ -146,6 +228,7 @@ function setHumidityChart(data){
                 ticks: {
                     autoSkip: true,
                     autoSkipPadding: 20,
+                    maxRotation: 20,
                 },
                 type: 'time',
                 time: {
@@ -168,49 +251,45 @@ function setHumidityChart(data){
     return humidity_chart
 }
 
-function setTempChart(data){
-    var ctx = document.getElementById("temperature_chart");
-    var warningPointRadius = temperature_data.map((value) => value < 20 ? 0 : 4);
-    
+function setDustChart(data){
+    var ctx = document.getElementById("dust_chart");
+
     var data = {
         labels: time_data,
         datasets: [{
-            name: 'temperature',
-            data: temperature_data,
-            //pointBorderColor: colours,
-            pointBackgroundColor: 'red',
+            name: 'dust',
+            data: dust_data,
+            borderColor: 'rgb(75, 192, 192)',
             fill: false,
             lineTension: 0,
-            pointRadius: warningPointRadius,
+            pointRadius: 0,
         }]
     }
 
     var options = {
-        responsive: true,
         legend: {
             display: false,
         },
         title: {
             display: true,
-            text: 'Temperature (Warning at 25 Celsius)',
+            text: 'Dust',
             fontSize: 16,
         },
         scales: {
             yAxes: [{
                 ticks: {
-                    suggestedMin: 10,
-                    suggestedMax: 30,
+                    suggestedMin: 0,
+                    suggestedMax: 100,
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: 'Degree Celsius'
                 },
             }],
             xAxes: [{
                 ticks: {
                     autoSkip: true,
                     autoSkipPadding: 20,
-                    // maxTickLimit: 4,
+                    maxRotation: 20,
                 },
                 type: 'time',
                 time: {
@@ -224,13 +303,75 @@ function setTempChart(data){
         }
     }
 
-    var temperature_chart = new Chart(ctx, {
+    var dust_chart = new Chart(ctx, {
         type: 'line',
         data: data,
         options: options,
     })
 
-    return temperature_chart
+    return dust_chart
+}
+
+
+function setLightChart(data){
+    var ctx = document.getElementById("light_chart");
+
+    var data = {
+        labels: time_data,
+        datasets: [{
+            name: 'light',
+            data: light_data,
+            borderColor: 'rgb(75, 192, 192)',
+            fill: false,
+            lineTension: 0,
+            pointRadius: 0,
+        }]
+    }
+
+    var options = {
+        legend: {
+            display: false,
+        },
+        title: {
+            display: true,
+            text: 'Light',
+            fontSize: 16,
+        },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    suggestedMin: 0,
+                    suggestedMax: 10,
+                },
+                scaleLabel: {
+                    display: true,
+                },
+            }],
+            xAxes: [{
+                ticks: {
+                    autoSkip: true,
+                    autoSkipPadding: 20,
+                    maxRotation: 20,
+                },
+                type: 'time',
+                time: {
+                    unit: 'minute',
+                    tooltipFormat: 'DD/MM/YY - HH:mm:ss',
+                    displayFormats: {
+                        'minute': 'DD/MM - HH:mm',
+                    }
+                }
+            }]
+        }
+    }
+
+    var light_chart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: options,
+    })
+
+    return light_chart
 }
 
 
@@ -250,6 +391,20 @@ function updateChart(chart, data) {
             else if (dataset.name == 'humidity') {
                 // update measurements
                 dataset.data.unshift(data.data[0].humidity)
+                if (dataset.data.length > 60) { 
+                    dataset.data.pop()
+                }
+            }
+            else if (dataset.name == 'dust') {
+                // update measurements
+                dataset.data.unshift(data.data[0].dust)
+                if (dataset.data.length > 60) { 
+                    dataset.data.pop()
+                }
+            }
+            else if (dataset.name == 'light') {
+                // update measurements
+                dataset.data.unshift(data.data[0].light)
                 if (dataset.data.length > 60) { 
                     dataset.data.pop()
                 }
