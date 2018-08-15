@@ -120,6 +120,8 @@ def send_json(request):
             device_id = request.POST['device_id']
             temp = int(request.POST['temperature'])
             humd = int(request.POST['humidity'])
+            dust = int(request.POST['dust'])
+            light = int(request.POST['light'])
             time = request.POST['collection_date']
 
             try:
@@ -133,7 +135,9 @@ def send_json(request):
             finally:
                 #device = Device.objects.get(id = device_id)
                 # create a new data object for the correct device
-                data_object = Data.objects.create(device = device, collection_date = time, temperature = temp, humidity = humd)
+                data_object = Data.objects.create(device = device, collection_date = time, \
+                                                  temperature = temp, humidity = humd, dust = dust, \
+                                                  light = light, )
                 global data
                 data += 1
                 return HttpResponse(data_object)

@@ -82,6 +82,8 @@ class Data(models.Model):
             'date': date,
             'temperature': self.temperature,
             'humidity': self.humidity,
+            'dust': self.dust,
+            'light': self.light,
         }
 
 class Email(models.Model):

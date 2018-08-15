@@ -12,6 +12,9 @@ myurl = "http://127.0.0.1:8000/send-json/"
 client = requests.session()
 n = 1
 temperature = 20
+humidity = 50
+dust = 50
+
 
 # Retrieve CSRF token, this doesn't seem to work
 # client.get("http://127.0.0.1:8000/admin") # sets cookie
@@ -20,9 +23,10 @@ temperature = 20
 #login_data = dict(username='testi', password='prototesti', csrfmiddlewaretoken=csrftoken, next='/')
 
 while True:
-    pollution = random.choice(["good", "average", "bad"])
+    dust += random.randint(-2,2)
     temperature += random.randint(-1, 1)
-    humidity = random.randint(2000, 2100)
+    humidity += random.randint(-3, 3)
+    light = random.randint(0, 10)
     collection_date = datetime.datetime.now()
     device_id = '1'
 
@@ -34,9 +38,10 @@ while True:
         #"csrfmiddlewaretoken" : csrftoken,
         "device_id" : device_id,
         "collection_date" : collection_date,
-        "pollution" : pollution,
         "temperature" : temperature,
-        "humidity" : humidity
+        "humidity" : humidity,
+        "dust" : dust,
+        "light" : light,
 
     }
     header = {'content-type': 'application/json'}
