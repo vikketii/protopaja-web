@@ -32,5 +32,6 @@ urlpatterns = [
     path('change_humd_settings/', views.change_humd_settings, name='change_humd_settings'),
     path('humd_settings/', views.humd_settings, name='humd_settings'),
     path('change_light_settings/', views.change_light_settings, name='change_light_settings'),
-    path('light_settings/', views.light_settings, name='light_settings')
+    path('light_settings/', views.light_settings, name='light_settings'),
+    path('alarm_csv/', views.alarm_csv, name='alarm_csv')
 ]

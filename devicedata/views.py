@@ -11,6 +11,7 @@ from django.contrib.auth import authenticate, login
 import datetime
 from django.shortcuts import redirect
 from .tasks import *
+import csv
 """
 class IndexView(generic.ListView):
     template_name = 'devicedata/index.html'
@@ -758,3 +759,25 @@ def light_settings(request):
 	 'success' : success
 	}
 	return render(request,'devicedata/light_settings.html',content)
+
+
+@login_required
+def alarm_csv(request):
+    # Create the HttpResponse object with the appropriate CSV header
+    # This may time out if there is too many alarms in the database
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="all_alarms.csv"'
+
+    writer = csv.writer(response)
+    alarms = Alarm.objects.all().order_by('-time')
+    writer.writerow(['Alarm_type','ID','Time triggered','Time acknowledged','Time over'])
+    for i in range(0,len(alarms)):
+    	if alarms[i].time_over and alarms[i].time_ack:
+    		writer.writerow([alarms[i].alarm_type, alarms[i].id, alarms[i].time, alarms[i].time_ack,alarms[i].time_over])
+    	elif alarms[i].time_ack:
+    		writer.writerow([alarms[i].alarm_type, alarms[i].id, alarms[i].time, alarms[i].time_ack,'Alarm still on'])
+    	else:
+    		writer.writerow([alarms[i].alarm_type, alarms[i].id, alarms[i].time, 'Alarm not acknowledged','Alarm still on'])
+    
+
+    return response
