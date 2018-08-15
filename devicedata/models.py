@@ -12,14 +12,17 @@ class Device(models.Model):
     datapoints = models.IntegerField(default=5)
     preference = models.BooleanField(default=False)
 
-    dust_warnings = models.IntegerField(default=0) #this is used to detect if warning email needs to be send
-    # this is the value which triggers warning emails
+    # Alarms, from legacy reasons named warnings, should be alarms 
+
+    dust_warnings = models.IntegerField(default=0) #this is used to detect if an alarm email needs to be send
+    # this is the value which triggers alarms
     dust_set_point = models.IntegerField(default=51) 
-    # this is user defined value that tells how many warnings lead to a warning email and alarm
+    # this is user defined value that tells how many alarms lead to an alarm email and alarm
     dust_trigger = models.IntegerField(default=2)
 
+
     temp_warnings = models.IntegerField(default=0)
-    temp_treshold = models.IntegerField(default=26)
+    temp_treshold = models.IntegerField(default=30)
     temp_trigger = models.IntegerField(default=2)
 
     humd_warnings = models.IntegerField(default=0)
@@ -29,6 +32,14 @@ class Device(models.Model):
     light_warnings = models.IntegerField(default=0)
     light_treshold = models.IntegerField(default=10000) #disabled with stardard settings
     light_trigger = models.IntegerField(default=2)
+
+    # Warning tresholds, these can be configured separately and don't trigger an email nor alarm
+    # all devices uses these to show warnings
+    # light could also have one but seems unnecessary
+    dust_warning = models.IntegerField(default=35)
+    temp_warning = models.IntegerField(default=26)
+    humd_warning = models.IntegerField(default=55)
+    light_warning = models.IntegerField(default=10000) #disabled
 
 
 

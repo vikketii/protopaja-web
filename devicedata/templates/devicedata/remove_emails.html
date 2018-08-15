@@ -1,7 +1,18 @@
 {% extends 'base_generic.html' %}
 
 {% block content %}
-<h2 align="center"> Delete emails</h2>
+<h2 align="center"> Remove emails</h2>
+
+<br/>
+<br/>
+<br/>
+
+<nav class="nav nav-pills">
+  <a class="nav-item nav-link" href="{% url 'add_emails' %}">Add emails</a>
+  <a class="nav-item nav-link active" href="{% url 'remove_emails' %}">Remove emails</a>
+</nav>
+<br/>
+<br/>
 
 
   {% if emails %}
