@@ -754,6 +754,7 @@ def light_settings(request):
 	 'devices' : devices,
 	 'success' : success
 	}
+	return render(request,'devicedata/light_settings.html',content)
 
 
 @login_required
