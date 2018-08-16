@@ -16,7 +16,7 @@ class Device(models.Model):
 
     dust_warnings = models.IntegerField(default=0) #this is used to detect if an alarm email needs to be send
     # this is the value which triggers alarms
-    dust_set_point = models.IntegerField(default=51) 
+    dust_set_point = models.IntegerField(default=20) 
     # this is user defined value that tells how many alarms lead to an alarm email and alarm
     dust_trigger = models.IntegerField(default=2)
 
@@ -36,7 +36,7 @@ class Device(models.Model):
     # Warning tresholds, these can be configured separately and don't trigger an email nor alarm
     # all devices uses these to show warnings
     # light could also have one but seems unnecessary
-    dust_warning = models.IntegerField(default=35)
+    dust_warning = models.IntegerField(default=8)
     temp_warning = models.IntegerField(default=26)
     humd_warning = models.IntegerField(default=55)
     light_warning = models.IntegerField(default=10000) #disabled

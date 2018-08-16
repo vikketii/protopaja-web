@@ -592,7 +592,7 @@ def show_alarm(request):
 def change_alarm_settings(request):
 	devices = Device.objects.all()
 	content = {
-	 'options' : range(20,100),
+	 'options' : range(1,100),
 	 'devices' : devices,
 	 'success' : False
 	}
@@ -625,7 +625,7 @@ def update_settings(request):
 		
 	devices = Device.objects.all()
 	content = {
-	 'options' : range(20,100),
+	 'options' : range(1,100),
 	 'devices' : devices,
 	 'success' : success
 	}
