@@ -126,7 +126,7 @@ function setCharts(data){
 
 function setTempChart(data){
     var ctx = document.getElementById("temperature_chart");
-    var warningPointRadius = temperature_data.map((value) => value < 20 ? 0 : 4);
+    var warningPointRadius = temperature_data.map((value) => value < 26 ? 0 : 4);
     
     var data = {
         labels: time_data,
@@ -147,7 +147,7 @@ function setTempChart(data){
         },
         title: {
             display: true,
-            text: 'Temperature (Warning at 25 Celsius)',
+            text: 'Temperature (Warning at 26' + String.fromCharCode(176) + 'C)',
             fontSize: 16,
         },
         scales: {
@@ -158,7 +158,7 @@ function setTempChart(data){
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: 'Degree Celsius'
+                    labelString: String.fromCharCode(176) + 'C',
                 },
             }],
             xAxes: [{
@@ -221,7 +221,7 @@ function setHumidityChart(data){
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: 'Percentage'
+                    labelString: '%'
                 },
             }],
             xAxes: [{
@@ -283,6 +283,7 @@ function setDustChart(data){
                 },
                 scaleLabel: {
                     display: true,
+                    labelString: '(pcs. / 0.5 dl)',
                 },
             }],
             xAxes: [{
@@ -385,7 +386,7 @@ function updateChart(chart, data) {
                     dataset.data.pop()
                 }
                 // update limit colors
-                var warningPointRadius = temperature_data.map((value) => value < 20 ? 0 : 4);
+                var warningPointRadius = temperature_data.map((value) => value < 26 ? 0 : 4);
                 dataset.pointRadius = warningPointRadius
             }
             else if (dataset.name == 'humidity') {
