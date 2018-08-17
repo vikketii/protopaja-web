@@ -79,6 +79,11 @@ class Data(models.Model):
         date = self.collection_date.strftime("%Y-%m-%dT%H:%M:%S")
         return {
             'device': self.device.id,
+            
+            'dust_warning': self.device.dust_warning,
+            'temp_warning': self.device.temp_warning, 
+            'humd_warning': self.device.humd_warning,
+
             'date': date,
             'temperature': self.temperature,
             'humidity': self.humidity,

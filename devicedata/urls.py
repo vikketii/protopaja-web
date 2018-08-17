@@ -7,7 +7,9 @@ urlpatterns = [
     path('charts/', views.charts, name='charts'),
     path('send-json/', views.send_json, name='send-json'),
     path('api/data/', views.get_data, name='api-data'),
-    path('device/<int:id>', views.device, name='history'),
+
+    path('api/device/<int:device_id>/', views.api_device, name='api_device'),
+
     path('data_table/', views.data_table, name='data_table'),
     path('update_data_table/', views.update_data_table, name='update_data_table'),
     path('devices/all_devices/', views.all_devices, name='all_devices'),

@@ -20,7 +20,19 @@
 
 
 {% block content %}
-<h1>Charts</h1>
+<h1 class='mb-4'>Charts</h1>
+
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select device
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% for device in devices %}
+      <a class="dropdown-item" id="{{ device.id }}">{{ device.info }}</a>
+    {% endfor %}
+  </div>
+</div>
+
 <div class="row">
     <div class="col-lg-6">
         <canvas id="temperature_chart"></canvas>
@@ -43,7 +55,11 @@
 <script>
 {% block script %}
 
-var endpoint = '/api/data/'
+var endpoint = ''
+
+var dust_warning = 0
+var temp_warning = 0
+var humd_warning = 0
 
 var time_data = []
 
@@ -54,48 +70,86 @@ var light_data = []
 
 var charts = []
 
-$.when(
-    $.ajax({
-        // Get measurement data from API
-        method: "GET", 
-        url: endpoint,
-        success: function(data){
-            getChartDatas(data)
-            setCharts(data)
-        },
-        error: function(error_data){
-            console.log("error")
-            console.log(error_data)
-        }
-    })
-// When the first setup is done, keep updating with setInterval
-).then(function() {
-    setInterval(function() {
+var interval = null
+
+// When device is selected, start chart setup
+$("a.dropdown-item").click(function() {
+    var id = $(this).attr('id')
+    charts_main(id)
+})
+ 
+function charts_main(id) {
+    endpoint = '/api/device/' + id + '/'
+
+    charts_clean()
+
+    $.when(
         $.ajax({
+            // Get measurement data from API
             method: "GET", 
             url: endpoint,
-            success: function(data) {
-                // start updating if newest time is not the same we already have
-                if (charts[0].data.labels[0] != data.data[0].date) {
-                    // update time
-                    time_data.unshift(data.data[0].date)
-                    if (time_data.length > 60) { 
-                        time_data.pop()
-                    }
-                    // update charts
-                    for (var i in charts) {
-                        updateChart(charts[i], data)
-                    }
-                }
+            success: function(data){
+                getChartWarningTresholds(data)
+                getChartDatas(data)
+                setCharts(data)
             },
             error: function(error_data){
                 console.log("error")
                 console.log(error_data)
             }
         })
-    }, 1000) // update interval in milliseconds
-})
+    // When the first setup is done, keep updating with setInterval
+    ).then(function() {
+        interval = setInterval(function() {
+            $.ajax({
+                method: "GET", 
+                url: endpoint,
+                success: function(data) {
+                    // start updating if newest time is not the same we already have
+                    if (charts[0].data.labels[0] != data.data[0].date) {
+                        // update time
+                        time_data.unshift(data.data[0].date)
+                        if (time_data.length > 60) { 
+                            time_data.pop()
+                        }
+                        // update charts
+                        for (var i in charts) {
+                            updateChart(charts[i], data)
+                        }
+                    }
+                },
+                error: function(error_data){
+                    console.log("error")
+                    console.log(error_data)
+                }
+            })
+        }, 1000) // update interval in milliseconds
+    })
+}
 
+
+function charts_clean(){
+    for (var i = 0; i < charts.length; i++) {
+        charts[i].destroy()
+    }
+
+    if (typeof interval != "undefined") {
+        clearInterval(interval)
+    }
+
+    time_data = []
+    temperature_data = []
+    humidity_data = []
+    dust_data = []
+    light_data = []
+    charts = []
+}
+
+function getChartWarningTresholds(data){
+    dust_warning = data.data[0].dust_warning
+    temp_warning = data.data[0].temp_warning
+    humd_warning = data.data[0].humd_warning
+}
 
 function getChartDatas(data){
     // Limits datapoints to n
@@ -126,15 +180,15 @@ function setCharts(data){
 
 function setTempChart(data){
     var ctx = document.getElementById("temperature_chart");
-    var warningPointRadius = temperature_data.map((value) => value < 26 ? 0 : 4);
+    var warningPointRadius = temperature_data.map((value) => value < temp_warning ? 0 : 4);
     
     var data = {
         labels: time_data,
         datasets: [{
             name: 'temperature',
             data: temperature_data,
-            //pointBorderColor: colours,
             pointBackgroundColor: 'red',
+            borderColor: 'rgb(192,192,192)',
             fill: false,
             lineTension: 0,
             pointRadius: warningPointRadius,
@@ -147,7 +201,7 @@ function setTempChart(data){
         },
         title: {
             display: true,
-            text: 'Temperature (Warning at 26' + String.fromCharCode(176) + 'C)',
+            text: 'Temperature (Warning at ' + temp_warning + ' ' + String.fromCharCode(176) + 'C)',
             fontSize: 16,
         },
         scales: {
@@ -191,16 +245,18 @@ function setTempChart(data){
 
 function setHumidityChart(data){
     var ctx = document.getElementById("humidity_chart");
+    var warningPointRadius = humidity_data.map((value) => value < humd_warning ? 0 : 4);
 
     var data = {
         labels: time_data,
         datasets: [{
             name: 'humidity',
             data: humidity_data,
-            borderColor: 'rgb(75, 192, 192)',
+            pointBackgroundColor: 'red',
+            borderColor: 'rgb(192, 192, 192)',
             fill: false,
             lineTension: 0, // 0: draw straight lines
-            pointRadius: 0,
+            pointRadius: warningPointRadius,
         }]
     }
 
@@ -210,7 +266,7 @@ function setHumidityChart(data){
         },
         title: {
             display: true,
-            text: 'Relative humidity',
+            text: 'Relative humidity (Warning at ' + humd_warning + ' %)',
             fontSize: 16,
         },
         scales: {
@@ -253,16 +309,18 @@ function setHumidityChart(data){
 
 function setDustChart(data){
     var ctx = document.getElementById("dust_chart");
+    var warningPointRadius = dust_data.map((value) => value < dust_warning ? 0 : 4);
 
     var data = {
         labels: time_data,
         datasets: [{
             name: 'dust',
             data: dust_data,
-            borderColor: 'rgb(75, 192, 192)',
+            pointBackgroundColor: 'red',
+            borderColor: 'rgb(192, 192, 192)',
             fill: false,
             lineTension: 0,
-            pointRadius: 0,
+            pointRadius: warningPointRadius,
         }]
     }
 
@@ -272,7 +330,7 @@ function setDustChart(data){
         },
         title: {
             display: true,
-            text: 'Dust',
+            text: 'Dust (Warning at ' + dust_warning + ' pcs./cl)',
             fontSize: 16,
         },
         scales: {
@@ -283,7 +341,7 @@ function setDustChart(data){
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: '(pcs. / 0.5 dl)',
+                    labelString: '(pcs. / cl)',
                 },
             }],
             xAxes: [{
@@ -395,6 +453,8 @@ function updateChart(chart, data) {
                 if (dataset.data.length > 60) { 
                     dataset.data.pop()
                 }
+                var warningPointRadius = humidity_data.map((value) => value < humd_warning ? 0 : 4);
+                dataset.pointRadius = warningPointRadius
             }
             else if (dataset.name == 'dust') {
                 // update measurements
@@ -402,6 +462,9 @@ function updateChart(chart, data) {
                 if (dataset.data.length > 60) { 
                     dataset.data.pop()
                 }
+
+                var warningPointRadius = dust_data.map((value) => value < dust_warning ? 0 : 4);
+                dataset.pointRadius = warningPointRadius
             }
             else if (dataset.name == 'light') {
                 // update measurements

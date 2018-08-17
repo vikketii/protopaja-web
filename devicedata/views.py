@@ -38,7 +38,8 @@ def index(request):
 
 @login_required
 def charts(request):
-    context = {}
+    devices = Device.objects.all()
+    context = { 'devices': devices }
     return render(request, 'devicedata/charts.html', context)
 
 
@@ -155,13 +156,12 @@ def get_data(request):
     return JsonResponse(({'data': data_list}), safe=False)
 
 @login_required
-def device(request, id):
-    try:
-        device = Device.objects.get(id=id)
-    except Device.DoesNotExist:
-        raise Http404('Device does not exist')
-    return HttpResponse('Device found')
+def api_device(request, device_id):
+    # Get data as dictionary, newest first and limit is 100
+    data_list = [ Data.as_dict() for Data in Data.objects.filter(device=device_id).order_by('-collection_date')[:100]]
 
+    # To get safe=True, we would have to write our own serializer
+    return JsonResponse(({'data': data_list}), safe=False)
 
 @login_required
 def all_devices (request):
