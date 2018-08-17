@@ -15,11 +15,19 @@ def send_warning_mail(user,cause):
 	email.send()
 
 @shared_task
-def update_device_warnings(device_id, dust, time, temp, humd, light):
+def send_voltage_mail(user,cause):
+	subject = ' Warning from Consair sensor system'
+	body = 'This message was sent because ' + cause + '\n' + 'battery voltage is too low!\n' + 'Instant action recommended!'
+	
+	email = EmailMessage(subject,body, to=[user])
+	email.send()
+
+@shared_task
+def update_device_warnings(device_id, dust, time, temp, humd, light, volts):
 	# id is device id, int
 	# dust is the latest dust value, compared to Device dust_set_point
 	device = Device.objects.get(id=device_id) #this will fail if device isn't found
-	warnings = [0,0,0,0] #dust, temp, humd, light, the order crusial, this is basically a list of booleans
+	warnings = [0,0,0,0,0] #dust, temp, humd, light, volts the order crusial, this is basically a list of booleans
 
 	if device:
 		
@@ -90,6 +98,18 @@ def update_device_warnings(device_id, dust, time, temp, humd, light):
 				alarms[i].time_over = time
 				alarms[i].save(update_fields=['time_over'])
 
+		if volts != 0 and volts <= device.volt_alarm:
+			if not Alarm.objects.select_related().filter(device_id=device_id, time_over=None, alarm='volts'):
+				# check there is no alarms active alarms yet for the same battery voltage issue
+				Alarm.objects.create(alarm_type=device.info+': battery voltage too low!', time=time, device_id=device_id, alarm='volts')
+				warnings[4] = 1
+
+		elif volts !=0 and volts >= 3.6:
+			alarms = Alarm.objects.select_related().filter(device_id=device_id, time_over=None, alarm='volts')
+			for i in range(0,len(alarms)):
+				alarms[i].time_over = time
+				alarms[i].save(update_fields=['time_over'])
+
 	return warnings
 
 
@@ -98,17 +118,22 @@ def update_device_warnings(device_id, dust, time, temp, humd, light):
 
 
 @shared_task
-def warning_emails(device, device_id, dust, time, temp, humd, light):
+def warning_emails(device, device_id, dust, time, temp, humd, light, volts):
 	# device is device name
 	
 	# first update warnings to Device objects
-	warnings = update_device_warnings(device_id, dust, time, temp, humd, light)
+	warnings = update_device_warnings(device_id, dust, time, temp, humd, light, volts)
 
 
-	if warnings != [0,0,0,0]:
+	if warnings != [0,0,0,0,0]:
 		emails = Email.objects.all()
+		if warnings == [0,0,0,0,1]:
+			#volts alarm
+			for i in range(0,len(emails)):
+				if emails[i].device_name == device or emails[i].device_name == 'All':
+					send_voltage_mail(emails[i].address, device) # if mails are send more, group mail should be used
 
-		for i in range(0,len(emails)):
-		
-			if emails[i].device_name == device or emails[i].device_name == 'All':
-				send_warning_mail(emails[i].address, device) # if mails are send more, group mail should be used
+		else:
+			for i in range(0,len(emails)):
+				if emails[i].device_name == device or emails[i].device_name == 'All':
+					send_warning_mail(emails[i].address, device) # if mails are send more, group mail should be used

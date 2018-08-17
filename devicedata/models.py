@@ -41,6 +41,11 @@ class Device(models.Model):
     humd_warning = models.IntegerField(default=55)
     light_warning = models.IntegerField(default=10000) #disabled
 
+    #Battery voltage, tresholds are not customisable by enduser
+    volt_warning = models.FloatField(default=3.6)
+    volt_alarm = models.FloatField(default=3.4)
+
+
 
 
 
@@ -63,10 +68,9 @@ class Data(models.Model):
     temperature = models.IntegerField()
     humidity = models.IntegerField()
 
-    # TODO
     dust = models.IntegerField(null=True, blank=True)
     light = models.IntegerField(null=True, blank=True)
-    voltage = models.IntegerField(null=True, blank=True)
+    voltage = models.FloatField(default=100.0) # this only to make logic easier to make
 
 
     def __str__(self):
@@ -109,4 +113,4 @@ class Alarm(models.Model):
     time_ack = models.DateTimeField(null=True) #time when alarm was inactivated
     active = models.BooleanField(default = True) #tells whether alarms is active or not
     device_id = models.IntegerField(null=True) #link to device
-    alarm= models.CharField(null=True, max_length=20) #dust, temp, humd, light
+    alarm= models.CharField(null=True, max_length=20) #dust, temp, humd, light, volts

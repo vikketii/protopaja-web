@@ -21,11 +21,12 @@ while True:
     humidity = random.randint(50, 70)
     light = random.randint(0,9)
     device_id = str(random.randint(1,3))
+    volts = random.uniform(3,4)
     #device_id = '2'
 
     
 
-    data = "username: testi, password:prototesti, device_id:"+ device_id + ", temp:" + str(temperature) + ",humd:" + str(humidity) + ",dust:" + str(dust) +",light:" + str(light)
+    data = "username: testi, password:prototesti, device_id:"+ device_id + ", temp:" + str(temperature) + ",humd:" + str(humidity) + ",dust:" + str(dust) +",light:" + str(light) + ", volts:" +str(volts)
     
     
     # json.dumps(default=str) is "dirty" way to convert unindentified objects to string
@@ -36,4 +37,4 @@ while True:
     print("{0}. packet send. Response (first 40 char): {1}" .format(n, response.content[:40]))
 
     n += 1
-    time.sleep(2)
+    time.sleep(20)
