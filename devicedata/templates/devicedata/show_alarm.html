@@ -13,13 +13,17 @@
 		{% if alarm.time_over %}
 			<li>Situation normalized: {{alarm.time_over}}</li>
 			<br/>
-			<li>For possible extra information, check out database entries</li>
+			<li>
+				<a href="{% url 'alarm_csv' %}">For extra information, get all alarms as csv</a>
+			</li>
 			<br/>
 			<a href="{% url 'remove_alarms' %}?alarm_id={{alarm.id}}"> Inactivate alarm</a>
 		{% else %}
 			<li><b><font color="red">Alarm still on, immediate action needed!</font></b></li>
 			<br/>
-			<li>For possible extra information, check out database entries</li>
+			<li>
+				<a href="{% url 'alarm_csv' %}">For extra information, get all alarms as csv</a>
+			</li>
 			<br/>
 			<a href="{% url 'remove_alarms' %}?alarm_id={{alarm.id}}"> Inactivate alarm (not recommended)</a>
 		{% endif %}

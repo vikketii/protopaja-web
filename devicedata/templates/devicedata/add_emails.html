@@ -28,7 +28,11 @@
 </nav>
 <br/>
 <br/>
-<h4>Already added emails</h4>
+{% if email_list %}
+  <h4>Already added emails</h4>
+{% else %}
+  <h4> No alarm emails</h4>
+{% endif %}
 <br/>
 
 <ul class="list-group">
@@ -43,7 +47,7 @@
 <p>
   <br/>
 	<br>Alarms are send to emails specified here</br>
-	<br>Select whether you want all alarms or just the alarms of one sensor station</br>
+	
   <br>5 different emails can be provided</br>
   <br>
 </p>
@@ -55,6 +59,8 @@
     <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com" name="email_addr">
   </div>
   <div class="form-group">
+    <br>Select whether you want all alarms or just the alarms of one sensor station</br>
+    <br/>
     <label for="exampleFormControlSelect1">Select sensor stations</label>
     <select class="form-control" id="exampleFormControlSelect1" name="select_device">
       

@@ -5,9 +5,14 @@
 <h2 align="center">Alarm settings</h2>
 
 <br/>
-{% if success %}
+{% if success == 1 %}
+  <!--<h5>Settings successfully modified</h5>-->
   <div class="alert alert-success">
   <strong>Light settings modified successfully!</strong> 
+  </div>
+{% elif success == 2 %}
+  <div class="alert alert-warning">
+  <strong>No devices modified</strong> 
   </div>
 {% endif %}
 <br/>
@@ -27,11 +32,29 @@
 <br/>
 <br/>
 
+<h5>Devices</h5>
+{% for device in devices %}
+  {% if device.light_treshold == 10000  and device.light_warning == 10000 %}
+    <a data-toggle="tooltip" data-html="true" title="<p align='left'>Warning: Turned off<br/>Alarm: Turned off<br/>Crossings: {{ device.light_trigger|add:'-1' }}</p>"><font color="black">{{ device.info }}</font></a>
+    <br/>
+  {% elif device.light_treshold == 10000 %}
+    <a data-toggle="tooltip" data-html="true" title="<p align='left'>Warning: {{ device.light_warning }}<br/>Alarm: Turned off<br/>Crossings: {{ device.light_trigger|add:'-1' }}</p>"><font color="black">{{ device.info }}</font></a>
+    <br/>
+  {% elif device.light_warning == 10000 %}
+    <a data-toggle="tooltip" data-html="true" title="<p align='left'>Warning: Turned off<br/>Alarm: {{ device.light_treshold }}<br/>Crossings: {{ device.light_trigger|add:'-1' }}</p>"><font color="black">{{ device.info }}</font></a>
+    <br/>
+  {% else %}
+    <a data-toggle="tooltip" data-html="true" title="<p align='left'>Warning: {{ device.light_warning }}<br/>Alarm: {{ device.light_treshold }}<br/>Crossings: {{ device.light_trigger|add:'-1' }}</p>"><font color="black">{{ device.info }}</font></a>
+    <br/>
+  {% endif %}
+{% endfor %}
+
+<br/>
+
 <form action="{% url 'light_settings' %}" method="POST">
   {% csrf_token %}
   
   <div class="form-group">
-    <h5>Devices</h5>
     <p>All the devices your modification affects</p>
     <!--<label for="exampleFormControlSelect1">Devices</label>-->
     <select class="form-control" id="exampleFormControlSelect1" name="device_id">
@@ -85,3 +108,10 @@
 </form>
 
 {% endblock content %}
+
+<script>
+
+{% block script %}
+    $('[data-toggle="tooltip"]').tooltip();
+{% endblock %}
+</script>
