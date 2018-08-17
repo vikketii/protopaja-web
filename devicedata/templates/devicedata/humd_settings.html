@@ -5,9 +5,14 @@
 <h2 align="center">Alarm settings</h2>
 
 <br/>
-{% if success %}
+{% if success == 1 %}
+  <!--<h5>Settings successfully modified</h5>-->
   <div class="alert alert-success">
   <strong>Humidity settings modified successfully!</strong> 
+  </div>
+{% elif success == 2 %}
+  <div class="alert alert-warning">
+  <strong>No devices modified</strong> 
   </div>
 {% endif %}
 <br/>

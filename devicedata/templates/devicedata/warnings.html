@@ -48,9 +48,9 @@
       {% for alarm in alarms %}
         <form action="{% url 'remove_alarms' %}" method="POST">
           {% csrf_token %} 
-          <li class="list-group-item list-group-item-danger">
+          <li class="list-group-item list-group-item-danger" style="list-style-type:none;">
             <a href="{% url 'show_alarm' %}?alarm_id={{alarm.id}}"><font color='red'>{{ alarm.time}}&emsp;&emsp;{{alarm.alarm_type }}</font></a>
-            <input class="btn btn-danger" style="float: right;" type="submit" value="Inactivate alarm">
+            <input class="btn btn-danger" style="position: absolute; right: 0; top: 0; height:48px; border:1px solid black;" type="submit" value="Inactivate alarm">
             <input class="btn btn-danger" type="hidden" value="{{alarm.id}}" name="alarm_id">
           </li> 
         </form>
