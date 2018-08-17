@@ -70,7 +70,7 @@
 					  		</tr>
 					  		<tr class="table-success">
 					  			<td> <b> Temperature </b></td>
-					  			<td><font color="green">{{data.temperature}}  &#8451 </font></td>
+					  			<td><font color="green">{{data.temperature}}  &#8451; </font></td>
 					  			
 					  		</tr>
 					  		<tr class="table-success">
@@ -120,9 +120,9 @@
 					  		<tr class="table-warning">
 					  			<td> <b>Temperature </b></td>
 					  			{% if data.temperature >= data.device.temp_warning %}
-					  				<td><font color="#FF7700">{{data.temperature}} &#8451 </font></td>
+					  				<td><font color="#FF7700">{{data.temperature}} &#8451; </font></td>
 					  			{% else %}
-					  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+					  				<td><font color="green">{{data.temperature}} &#8451; </font></td>
 					  			{% endif %}
 					  		</tr>
 					  		<tr class="table-warning">
@@ -184,11 +184,11 @@
 				  		<tr class="table-danger">
 				  			<td> <b>Temperature </b></td>
 				  			{% if data.temperature >= data.device.temp_treshold %}
-				  				<td><font color="red">{{data.temperature}} &#8451 </font></td>
+				  				<td><font color="red">{{data.temperature}} &#8451; </font></td>
 			  				{% elif data.temperature >= data.device.temp_warning %}
-			  					<td><font color="#FF7700">{{data.temperature}} &#8451 </font></td>
+			  					<td><font color="#FF7700">{{data.temperature}} &#8451; </font></td>
 				  			{% else %}
-				  				<td><font color="green">{{data.temperature}} &#8451 </font></td>
+				  				<td><font color="green">{{data.temperature}} &#8451; </font></td>
 				  			{% endif %}
 				  		</tr>
 				  		<tr class="table-danger">
