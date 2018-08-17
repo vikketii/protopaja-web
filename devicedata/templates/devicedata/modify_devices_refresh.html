@@ -5,11 +5,11 @@
             <!--<th>Device info</th>-->
             <!--<th>Description</th>-->
             <th>Time</th>
-            <th>Temperature (&#8451)</th>
-            <th>Dust (pcs. &sol; cl)</th>
-            <th>Humidity (&percnt;)</th>
+            <th>Temperature</th>
+            <th>Dust</th>
+            <th>Humidity</th>
             <th>Light</th>
-            <th>Battery (V)</th>
+            <th>Battery</th>
         </tr>
     </thead>
     <tbody>
@@ -22,29 +22,29 @@
                     <td><font color="black">{{ data.collection_date }}</font></td>
 
                     {% if data.temperature < device.temp_treshold and data.temperature < device.temp_warning %}
-                        <td><font color="green">{{ data.temperature }}</font></td>
+                        <td><font color="green">{{ data.temperature }} &#8451</font></td>
                     {% elif data.temperature < device.temp_treshold %}
-                        <td><font color="#FF7700">{{ data.temperature }}</font></td>
+                        <td><font color="#FF7700">{{ data.temperature }} &#8451</font></td>
                     {% else %}
-                        <td><font color="red">{{ data.temperature }}</font></td>
+                        <td><font color="red">{{ data.temperature }} &#8451</font></td>
                     {% endif %}
 
                     {% if data.dust < device.dust_set_point and data.dust < device.dust_warning %}
-                        <td><font color="green">{{ data.dust }}</font></td>
+                        <td><font color="green">{{ data.dust }} pcs. &sol; cl</font></td>
                     {% elif data.dust < device.dust_set_point %}
-                        <td><font color="#FF7700">{{ data.dust }}</font></td>
+                        <td><font color="#FF7700">{{ data.dust }} pcs. &sol; cl</font></td>
                     {% else %}
-                        <td><font color="red">{{ data.dust }}</font></td>
+                        <td><font color="red">{{ data.dust }} pcs. &sol; cl</font></td>
                     {% endif %}
 
     
 
                     {% if data.humidity < device.humd_treshold  and data.humidity < device.humd_warning %}
-                        <td><font color="green">{{ data.humidity }}</font></td>
+                        <td><font color="green">{{ data.humidity }} &percnt;</font></td>
                     {% elif data.humidity < device.humd_treshold %}
-                        <td><font color="#FF7700">{{ data.humidity }}</font></td>
+                        <td><font color="#FF7700">{{ data.humidity }} &percnt;</font></td>
                     {% else %}
-                        <td><font color="red">{{ data.humidity }}</font></td>
+                        <td><font color="red">{{ data.humidity }} &percnt;</font></td>
                     {% endif %}
 
                     {% if data.light < device.light_treshold and data.light < device.light_warning %}
@@ -64,11 +64,11 @@
                     {% if data.voltage != 100.0 %}
                         <!--<td>{{ data.voltage }}</td>-->
                         {% if data.voltage > device.volt_warning %}
-                            <td><font color="green">{{ data.voltage }}</font></td>
+                            <td><font color="green">{{ data.voltage }} V</font></td>
                         {% elif data.voltage > device.volt_alarm %}
-                            <td><font color="#FF7700">{{ data.voltage }}</font></td>
+                            <td><font color="#FF7700">{{ data.voltage }} V</font></td>
                         {% else %}
-                            <td><font color="red">{{ data.voltage }}</font></td>
+                            <td><font color="red">{{ data.voltage }} V</font></td>
                         {% endif %}
                     {% endif %}
 
