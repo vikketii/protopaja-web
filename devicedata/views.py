@@ -282,7 +282,7 @@ def send_string(request):
                 
         new_data = data_body.split(',')
         
-
+        volts = 0
         for i in range(0,len(new_data)):
             content = new_data[i].split(':')
             clean_content = content[0].strip()
@@ -309,6 +309,9 @@ def send_string(request):
             elif clean_content == 'light':
                 light = content[1].strip()
 
+            elif clean_content == 'volts':
+            	volts = content[1].strip()
+
                 
         user = authenticate(request, username=username, password=password)
         
@@ -328,7 +331,11 @@ def send_string(request):
             finally:
                 # create a new data object for the correct device
                 time = datetime.datetime.now() + datetime.timedelta(hours=3)
-                data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
+                if volts:
+                	data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light), voltage=float(volts))
+                else:
+                	data_object = Data.objects.create(device = device, collection_date = time, temperature = int(temp), humidity = int(humd), dust=int(dust), light=int(light))
+
                 global data
                 data += 1
 
@@ -336,7 +343,7 @@ def send_string(request):
                 # use celery to do async heavy work -> makes page more responsive
                 # check tasks.py
             
-                warning_emails.delay(device.info,int(device_id), int(dust),time, int(temp), int(humd), int(light))
+                warning_emails.delay(device.info,int(device_id), int(dust),time, int(temp), int(humd), int(light), float(volts))
                 return HttpResponse(data_object)
 
     # incorrect username/password

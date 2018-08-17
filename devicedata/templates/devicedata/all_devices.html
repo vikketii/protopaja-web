@@ -50,9 +50,9 @@
 
 	  		<table id="device_table" class="display" cellspacing="0" width="100%">
 
-	  			{% if data.temperature < data.device.temp_treshold and data.humidity < data.device.humd_treshold and data.dust < data.device.dust_set_point and data.light < data.device.light_treshold %}
+	  			{% if data.temperature < data.device.temp_treshold and data.humidity < data.device.humd_treshold and data.dust < data.device.dust_set_point and data.light < data.device.light_treshold and data.voltage > data.device.volt_alarm %}
 
-  					{% if data.temperature < data.device.temp_warning and data.humidity < data.device.humd_warning and data.dust < data.device.dust_warning and data.light < data.device.light_warning %}
+  					{% if data.temperature < data.device.temp_warning and data.humidity < data.device.humd_warning and data.dust < data.device.dust_warning and data.light < data.device.light_warning and data.voltage > data.device.volt_warning %}
 		  				<tbody>
 				  			{% if data.device.user_notes != None %}
 				  				<tr class="table-success">
@@ -89,6 +89,12 @@
 					  			<td> <font color="green">{{data.light}} </font></td>
 					  			
 				  			</tr>
+				  			{% if data.voltage != 100.0 %}
+				  				<tr class="table-success">
+				  					<td> <b>Battery voltage</b></td>
+					  				<td><font color="green">{{data.voltage}}</font></td>
+					  			</tr>
+					  		{% endif %}
 				  			
 				  		</tbody>
 
@@ -143,6 +149,16 @@
 					  				<td><font color="green">{{data.light}}</font></td>
 					  			{% endif %}		  			
 				  			</tr>
+				  			{% if data.voltage != 100.0 %}
+				  				<tr class="table-warning">
+				  					<td> <b>Battery voltage</b></td>
+				  					{% if data.voltage > data.device.volt_warning %}
+					  					<td><font color="green">{{data.voltage}}</font></td>
+				  					{% else %}
+				  						<td><font color="#FF7700">{{data.voltage}}</font></td>
+			  						{% endif %}
+					  			</tr>
+					  		{% endif %}
 
 			  			</tbody>
 
@@ -206,6 +222,18 @@
 				  				<td><font color="green">{{data.light}}</font></td>
 				  			{% endif %}		  			
 			  			</tr>
+			  			{% if data.voltage != 100.0 %}
+			  				<tr class="table-danger">
+			  					<td> <b>Battery voltage</b></td>
+			  					{% if data.voltage <= data.device.volt_alarm %}
+				  					<td><font color="red">{{data.voltage}}</font></td>
+			  					{% elif data.voltage <= data.device.volt_warning %}
+		  							<td><font color="#FF7700">{{data.voltage}}</font></td>
+			  					{% else %}
+			  						<td><font color="green">{{data.voltage}}</font></td>
+		  						{% endif %}
+				  			</tr>
+				  		{% endif %}
 
 		  			</tbody>
 		  		{% endif %}
