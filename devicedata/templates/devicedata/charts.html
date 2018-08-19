@@ -22,16 +22,22 @@
 {% block content %}
 <h1 class='mb-4'>Charts</h1>
 
-<div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Select device
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    {% for device in devices %}
-      <a class="dropdown-item" id="{{ device.id }}">{{ device.info }}</a>
-    {% endfor %}
-  </div>
-</div>
+{% if devices %}
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Select device
+        </button> 
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for device in devices %}
+                <a class="dropdown-item" id="{{ device.id }}">{{ device.info }}</a>
+            {% endfor %}    
+           
+        </div>
+    </div>
+{% else %}
+    <p>There is no added devices to show data from.</p>
+{% endif %}
+
 
 <div class="row">
     <div class="col-lg-6">
@@ -57,9 +63,13 @@
 
 var endpoint = ''
 
-var dust_warning = 0
-var temp_warning = 0
-var humd_warning = 0
+var temp_title_text = 'Temperature'
+var humd_title_text = 'Relative humidity'
+var dust_title_text = 'Dust'
+
+var dust_warning = 10000 // 10 000 is the same as disabled
+var temp_warning = 10000
+var humd_warning = 10000
 
 var time_data = []
 
@@ -146,9 +156,20 @@ function charts_clean(){
 }
 
 function getChartWarningTresholds(data){
-    dust_warning = data.data[0].dust_warning
-    temp_warning = data.data[0].temp_warning
-    humd_warning = data.data[0].humd_warning
+    // 10 000 is the same as disabled
+    if (data.data[0].temp_warning != 10000) {
+        temp_warning = data.data[0].temp_warning
+        temp_title_text = 'Temperature (Warning at ' + temp_warning + ' ' + String.fromCharCode(176) + 'C)'
+
+    }
+    if (data.data[0].humd_warning != 10000) {
+        humd_warning = data.data[0].humd_warning
+        humd_title_text = 'Relative humidity (Warning at ' + humd_warning + ' %)'
+    }
+    if (data.data[0].dust_warning != 10000) {
+        dust_warning = data.data[0].dust_warning
+        dust_title_text = 'Dust (Warning at ' + dust_warning + ' pcs./cl)'
+    }
 }
 
 function getChartDatas(data){
@@ -201,7 +222,7 @@ function setTempChart(data){
         },
         title: {
             display: true,
-            text: 'Temperature (Warning at ' + temp_warning + ' ' + String.fromCharCode(176) + 'C)',
+            text: temp_title_text,
             fontSize: 16,
         },
         scales: {
@@ -266,7 +287,7 @@ function setHumidityChart(data){
         },
         title: {
             display: true,
-            text: 'Relative humidity (Warning at ' + humd_warning + ' %)',
+            text: humd_title_text,
             fontSize: 16,
         },
         scales: {
@@ -330,7 +351,7 @@ function setDustChart(data){
         },
         title: {
             display: true,
-            text: 'Dust (Warning at ' + dust_warning + ' pcs./cl)',
+            text: dust_title_text,
             fontSize: 16,
         },
         scales: {

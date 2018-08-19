@@ -9,11 +9,12 @@ import sys
 
 # typo fixed in the url
 myurl = "http://127.0.0.1:8000/send-json/"
+#myurl = "http://vikke.me/send-json/"
 client = requests.session()
 n = 1
-temperature = 20
-humidity = 50
-dust = 50
+temperature = 16
+humidity = 20
+dust = 10
 
 
 # Retrieve CSRF token, this doesn't seem to work
@@ -28,7 +29,7 @@ while True:
     humidity += random.randint(-3, 3)
     light = random.randint(0, 10)
     collection_date = datetime.datetime.now()
-    device_id = '1'
+    device_id = '4'
 
 
     #json object, didn't get inner json working -> only 1 json
